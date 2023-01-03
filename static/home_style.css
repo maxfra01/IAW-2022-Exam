@@ -1,58 +1,80 @@
-*{
-   font-family:Verdana, Geneva, Tahoma, sans-serif;
+* {
+   font-family: Verdana, Geneva, Tahoma, sans-serif;
    border: 0;
    padding: 0;
 }
 
-main{
+main {
    display: flex;
    flex-wrap: wrap;
    justify-content: center;
 }
 
-article{
+article {
    max-width: 80%;
    display: flex;
-   justify-content:center;
+   justify-content: center;
    align-items: center;
    margin: 10px;
-   border-bottom:solid gray 1px;
+   border-bottom: solid gray 1px;
    padding: 10px;
 }
 
-img{
+img {
    max-width: 250px;
    max-height: 250px;
 }
 
-.left-container{
+.left-container {
    padding: 5px;
    margin: 10px;
 }
 
-.right-container{
+.right-container {
    padding: 5px;
    margin: 10px;
    max-width: 60%;
 }
 
-.show-info{
+.show-info {
    display: flex;
-   justify-content:space-between;
+   justify-content: space-between;
    padding: 5px;
 }
 
-#show-title{
+#show-title {
    font-size: large;
    font-weight: 600;
 }
-.btn-container{
+
+.btn-container {
    display: flex;
    justify-content: center;
 }
 
-.btn-show{
+.btn-show {
    border: solid gray 1px;
    padding: 5px;
+}
 
+.btn {
+   margin: 5px;
+}
+
+.episode-container {
+   display: flex;
+   flex-wrap: wrap;
+   justify-content: center;
+   justify-items: center;
+}
+
+.episode {
+   display: flex;
+   flex-wrap: wrap;
+   justify-content: space-between;
+   justify-content: center;
+}
+
+.episode>p {
+   display: inline;
 }
