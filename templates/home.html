@@ -15,7 +15,10 @@
   <!--INIZIO NAVBAR-->
   <nav class="navbar navbar-expand bg-dark navbar-dark">
     <div class="container-fluid">
-      <a class="navbar-brand" href="{{url_for('home')}}">MyPodcast</a>
+      <a class="navbar-brand" href="{{url_for('home')}}">
+        MyPodcast
+        <img src="{{url_for('static',filename='mic.png')}}" alt="MyPodcast logo">
+      </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
         aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -35,6 +38,7 @@
           </li>
         </ul>
         {% if current_user.is_authenticated %}
+        <a class="navbar-brand welcome">Bentornato {{current_user.name}}!</a>
         <a href="{{url_for('profile')}}" type="button" class="btn btn-outline-light" title="Logout">Profilo</a>
         <a href="{{ url_for('logout') }}" type="button" class="btn btn-outline-light" title="Logout">Logout</a>
         {% else %}
@@ -59,14 +63,14 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form action="login" method="post">
+          <form action="{{url_for('login')}}" method="post">
             <div class="mb-3">
               <label for="email" class="form-label">Email</label>
-              <input type="email" class="form-control" name="email" aria-describedby="Email">
+              <input type="email" required class="form-control" name="email" aria-describedby="Email">
             </div>
             <div class="mb-3">
               <label for="password" class="form-label">Password</label>
-              <input type="password" class="form-control" name="password">
+              <input type="password" required class="form-control" name="password">
             </div>
         </div>
         <div class="modal-footer">
@@ -88,26 +92,26 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form action="signup" method="post">
+          <form action="{{url_for('signup')}}" method="post">
             <div class="mb-3">
               <label for="name" class="form-label">Nome</label>
-              <input type="text" class="form-control" name="name" aria-describedby="Nome">
+              <input type="text" required class="form-control" name="name" aria-describedby="Nome">
             </div>
             <div class="mb-3">
               <label for="surname" class="form-label">Cognome</label>
-              <input type="text" class="form-control" name="surname" aria-describedby="Cognome">
+              <input type="text" required class="form-control" name="surname" aria-describedby="Cognome">
             </div>
             <div class="mb-3">
               <label for="email" class="form-label">Email</label>
-              <input type="email" class="form-control" name="email" aria-describedby="Email">
+              <input type="email" required class="form-control" name="email" aria-describedby="Email">
             </div>
             <div class="mb-3">
               <label for="password" class="form-label">Password</label>
-              <input type="password" class="form-control" name="password">
+              <input type="password" required class="form-control" name="password">
             </div>
             <div class="mb-3">
               <label for="type" class="form-label">Ruolo</label>
-              <select name="type" name="type" class="form-select">
+              <select name="type" required name="type" class="form-select">
                 <option value="ascoltatore">Ascoltatore</option>
                 <option value="creatore">Creatore</option>
               </select>
@@ -134,9 +138,9 @@
   {% endwith %}
 
   <!--elenco delle serie di podcast-->
-  <main>
+  <main class="show-list">
     {% for serie in serie %}
-    <article>
+    <article class="show-container">
       <div class="img-container">
         <img src="{{url_for('static', filename=serie.image)}}" alt="immagine di {{serie.title}}">
       </div>
@@ -149,9 +153,7 @@
           <p>{{serie.description}} #{{serie.category}} </p>
         </div>
         <div class="btn-container">
-          <form action="show/{{serie.id}}">
-            <button type="submit" class="btn btn-dark btn-show">Ascolta ora</button>
-          </form>
+          <a class="btn btn-dark btn-show" href="{{url_for('show', show_id=serie.id)}}">Ascolta ora</a>
         </div>
       </div>
     </article>

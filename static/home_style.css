@@ -4,13 +4,17 @@
    padding: 0;
 }
 
-main {
+.welcome{
+   font-size: medium !important;
+}
+
+.show-list{
    display: flex;
    flex-wrap: wrap;
    justify-content: center;
 }
 
-article {
+.show-container {
    max-width: 80%;
    display: flex;
    justify-content: center;
@@ -19,6 +23,7 @@ article {
    border-bottom: solid gray 1px;
    padding: 10px;
 }
+
 
 img {
    max-width: 250px;
@@ -58,23 +63,26 @@ img {
 }
 
 .btn {
+   padding: 5px;
    margin: 5px;
 }
 
-.episode-container {
+
+
+/*profile.html*/
+
+
+.left-aside{
+   margin: 20px;
+   padding: 20px;
    display: flex;
+   flex-direction: column;
    flex-wrap: wrap;
-   justify-content: center;
-   justify-items: center;
+   align-items: center;
 }
 
-.episode {
-   display: flex;
-   flex-wrap: wrap;
-   justify-content: space-between;
-   justify-content: center;
-}
 
-.episode>p {
-   display: inline;
+.right-aside{
+   margin: 20px;
+   padding: 20px;
 }

@@ -7,24 +7,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
-
-  <title>Profile</title>
+  <link rel="stylesheet" href="{{url_for('static', filename='home_style.css')}}">
+  <title>MyPodcast profile</title>
 </head>
 
 <body>
-  {% if current_user.type=='creatore' %}
-  <h1>Le mie serie</h1>
-  {% for serie in mie_serie %}
-  {{serie.title}}
-  <button data-bs-toggle="modal" data-bs-target="#new-episode-modal">ADD EPISODE</button>
-  <button>EDIT</button>
-  <button>DELETE</button>
-  {% endfor%}
 
-  {% else %}
-  <h1>Le mie serie seguite</h1>
-  {%endif %}
-
+  <!--INIZIO NAVBAR-->
+  <nav class="navbar navbar-expand bg-dark navbar-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="{{url_for('home')}}">
+        MyPodcast
+        <img src="{{url_for('static',filename='mic.png')}}" alt="MyPodcast logo">
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0"></ul>
+        {% if current_user.is_authenticated %}
+        <a href="{{ url_for('logout') }}" type="button" class="btn btn-outline-light" title="Logout">Logout</a>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
 
   <!--FLASH-->
   {% with messages = get_flashed_messages(with_categories=true) %}
@@ -38,10 +45,63 @@
   {% endif %}
   {% endwith %}
 
-  <!--BOTTONE TRIGGER DEL MODALE PER NUOVA SERIE-->
-  <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#new-show-modal">
-    Nuova serie
-  </button>
+  <!--INIZIO CONTENUTO-->
+  <main class="profile-main">
+    <div class="row">
+      <aside class="left-aside col-2">
+        <img src="{{url_for('static',filename='avatar.png')}}" alt="avatar">
+        <div class="row">{{current_user.name}} {{current_user.surname}}</div>
+        <div class="row">{{current_user.email}}</div>
+        <div class="row">Ruolo: {{current_user.type}}</div>
+        <p></p>
+        <img src="{{url_for('static',filename='wrench.png')}}" alt="tools">
+        <!--BOTTONE TRIGGER DEL MODALE PER NUOVA SERIE-->
+        <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#new-show-modal">
+          Nuova serie
+        </button>
+      </aside>
+
+      <aside class="right-aside col-9">
+        {% if current_user.type=='creatore' %}
+        <h1>Le mie serie</h1>
+        {% for serie in mie_serie %}
+        <div class="container text-center">
+          <div class="row">
+            <div class="col-4">
+              <a type="text" class="btn"  >{{serie.title}}</a>
+            </div>
+            <div class="col-2">
+              <a type="text" class="btn btn-outline-warning" href="{{url_for('show',show_id=serie.id)}}">Modifica Serie</a>
+            </div>
+            <div class="col-2">
+              <a class="btn btn-outline-danger" href="{{url_for('delete_show', show_id=serie.id)}}">Elimina serie</a>
+              <!--<a class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="delete-modal">Elimina Serie</a>-->
+            </div>
+          </div>
+        </div>
+        {% endfor%}
+        {%endif %}
+
+
+        <h1>Serie seguite</h1>
+        {% for serie in serie_seguite %}
+        <div class="container text-center">
+          <div class="row">
+            <div class="col-4">{{serie.title}}</div>
+            <div class="col-2">
+              <a class="btn btn-outline-danger" href="{{url_for('unfollow_a_show', show_id=serie.id)}}">Smetti di
+                seguire</a>
+            </div>
+          </div>
+          {% endfor%}
+
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  
+
 
 
   <!--MODALE PER NUOVA SERIE-->
@@ -54,33 +114,54 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form action="new-show" method="post">
+          <form action="new-show" enctype="multipart/form-data" method="post">
             <div class="mb-3">
               <label for="title" class="form-label">Titolo</label>
-              <input type="text" class="form-control" name="title" aria-describedby="Titolo della serie">
+              <input type="text"required class="form-control" name="title" aria-describedby="Titolo della serie">
             </div>
             <div class="mb-3">
               <label for="category" class="form-label">Categoria</label>
-              <input type="text" class="form-control" name="category" aria-describedby="Categoria della serie">
+              <input type="text" required class="form-control" name="category" aria-describedby="Categoria della serie">
             </div>
             <div class="mb-3">
               <label for="description" class="form-label">Descrizione</label>
-              <input type="text" class="form-control" name="description" aria-describedby="Descrizione della serie">
+              <input type="text" required class="form-control" name="description" aria-describedby="Descrizione della serie">
             </div>
             <div class="mb-3">
               <label for="image" class="form-label">Immagine di copertina</label>
-              <input type="file" class="form-control" name="image" aria-describedby="Immagine della serie">
+              <input type="file" required  class="form-control" name="image" aria-describedby="Immagine della serie">
             </div>
         </div>
         <div class="modal-footer">
-          <button type="submit" class="btn btn-outline-dark">Crea la serie</button>
+          <button type="submit" class="btn btn-outline-success">Crea la serie</button>
           </form>
         </div>
       </div>
     </div>
   </div>
 
- 
+  
+
+  <!--MODALE CONFERMA ELIMINAZIONE-->
+  <div class="modal" id="delete-modal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Vuoi davvero eliminare la serie?</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>L'azione è irreversibile e non potrai recuperare il contenuto, inclusi episodi e commenti.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
     crossorigin="anonymous"></script>
