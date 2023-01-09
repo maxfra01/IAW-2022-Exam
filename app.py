@@ -5,7 +5,7 @@ from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 import dao
 from models.User import User
-
+#flask
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'mistero'
 app.config['SESSION_TYPE'] = 'filesystem'
