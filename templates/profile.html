@@ -7,6 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
   <link rel="stylesheet" href="{{url_for('static', filename='home_style.css')}}">
   <title>MyPodcast profile</title>
 </head>
@@ -17,9 +18,8 @@
   <nav class="navbar navbar-expand bg-dark navbar-dark">
     <div class="container-fluid">
       <a class="navbar-brand" href="{{url_for('home')}}">
-        MyPodcast
-        <img src="{{url_for('static',filename='mic.png')}}" alt="MyPodcast logo">
-      </a>
+        MyPodcast 
+        <i class="bi bi-mic"></i>      </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
         aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -27,7 +27,7 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0"></ul>
         {% if current_user.is_authenticated %}
-        <a href="{{ url_for('logout') }}" type="button" class="btn btn-outline-light" title="Logout">Logout</a>
+        <a href="{{ url_for('logout') }}" type="button" class="btn btn-outline-light" title="Logout"><i class="bi bi-box-arrow-left"></i> Logout</a>
         {% endif %}
       </div>
     </div>
@@ -54,11 +54,14 @@
         <div class="row">{{current_user.email}}</div>
         <div class="row">Ruolo: {{current_user.type}}</div>
         <p></p>
+        {%if current_user.type=='creatore' %}
         <img src="{{url_for('static',filename='wrench.png')}}" alt="tools">
         <!--BOTTONE TRIGGER DEL MODALE PER NUOVA SERIE-->
         <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#new-show-modal">
+          <i class="bi bi-plus-circle-dotted"></i>
           Nuova serie
         </button>
+        {% endif %}
       </aside>
 
       <aside class="right-aside col-9">
@@ -68,13 +71,13 @@
         <div class="container text-center">
           <div class="row">
             <div class="col-4">
-              <a type="text" class="btn"  >{{serie.title}}</a>
+              <a type="text" href="{{url_for('show',show_id=serie.id)}}">{{serie.title}}</a>
             </div>
             <div class="col-2">
-              <a type="text" class="btn btn-outline-warning" href="{{url_for('show',show_id=serie.id)}}">Modifica Serie</a>
+              <a type="text" class="btn btn-outline-warning" href="{{url_for('show',show_id=serie.id)}}"><i class="bi bi-pencil-square"></i></a>
             </div>
             <div class="col-2">
-              <a class="btn btn-outline-danger" href="{{url_for('delete_show', show_id=serie.id)}}">Elimina serie</a>
+              <a class="btn btn-outline-danger" href="{{url_for('delete_show', show_id=serie.id)}}"><i class="bi bi-trash"></i></a>
               <!--<a class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="delete-modal">Elimina Serie</a>-->
             </div>
           </div>
@@ -128,7 +131,7 @@
               <input type="text" required class="form-control" name="description" aria-describedby="Descrizione della serie">
             </div>
             <div class="mb-3">
-              <label for="image" class="form-label">Immagine di copertina</label>
+              <label for="image" class="form-label">Copertina</label>
               <input type="file" required  class="form-control" name="image" aria-describedby="Immagine della serie">
             </div>
         </div>

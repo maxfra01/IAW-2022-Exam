@@ -33,7 +33,7 @@ def show(show_id):
    commenti=dao.get_comments_by_show_id(show_id)
    return render_template('show.html', serie=serie, episodi=episodi, commenti=commenti)
    
-
+#TODO Validare campi
 @app.route("/signup", methods=["POST"])
 def signup():
    if request.method=="POST":
@@ -142,7 +142,8 @@ def unfollow_a_show(show_id):
       flash('Si è verificato un problema ', 'danger')
       return redirect(url_for('show', show_id=show_id))
 
-
+#CREARE, MODIFICARE SERIE
+#TODO valida campi
 @app.route('/new-show',methods=["POST"])
 @login_required
 def newshow():
@@ -175,9 +176,60 @@ def newshow():
       else:
          flash('Errore nella creazione della serie', 'danger')
          return redirect(url_for('profile'))
-     
-     
-         
+
+#TODO valida campi
+@app.route('/show/edit-show/<int:show_id>', methods=['POST'])
+@login_required
+def edit_show(show_id):
+   if current_user.type != 'creatore':
+      flash('Non disponi dei privilegi necessari per eseguire ques\'azione', 'danger')
+      return redirect(url_for('show', show_id=show_id))
+   
+   if request.method=='POST':
+      old_show=dao.get_show_by_id(show_id)
+      nuovo_titolo=request.form.get('title')
+      nuovo_categoria=request.form.get('category')
+      nuova_descrizione=request.form.get('description')
+      nuova_immagine=request.files['image']
+      filename=old_show['image']
+      if nuova_immagine:
+         filename = secure_filename(nuova_immagine.filename)
+         nuova_immagine.save('static/' + filename)
+      
+      new_show={'id': old_show['id'], 
+                'title':nuovo_titolo, 
+                'category': nuovo_categoria,
+                'description': nuova_descrizione,
+                'image':filename,
+                'creator_id': current_user.id,
+                'creator_name': current_user.name + " " +current_user.surname
+      }
+      
+      success=dao.edit_show(new_show)
+      
+      if success:
+         flash('Modifica della serie avvenuta correttamente','success')
+         return redirect(url_for('show', show_id=show_id))
+      else:
+         flash('Errore nella modifica della serie', 'danger')
+         return redirect(url_for('show', show_id=show_id))
+
+@app.route('/delete-show/<int:show_id>')
+@login_required
+def delete_show(show_id):
+   if current_user.type != 'creatore':
+      flash('Non disponi dei privilegi necessari per eseguire ques\'azione', 'danger')
+      return redirect(url_for('profile'))
+   success=dao.delete_show(show_id)
+   if success:
+      flash('Eliminazione della serie avvenuta correttamente','success')
+      return redirect(url_for('profile'))
+   else:
+      flash('Errore nell\'eliminazione della serie','danger')
+      return redirect(url_for('profile'))
+
+#AGGIUNGI, ELIMINA EPISODI
+#TODO valida campi
 @app.route('/new-episode/<int:show_id>', methods=["POST"])
 @login_required
 def add_episode(show_id):
@@ -191,7 +243,7 @@ def add_episode(show_id):
       audio=request.files['audio']
       filename=secure_filename(audio.filename)
       if audio:
-         audio.save('/static'+ filename)
+         audio.save('static/'+ filename)
          
       new_episode={
          'show_id':show_id,
@@ -210,27 +262,28 @@ def add_episode(show_id):
          flash('Errore nel caricamento dell\'episodio', 'danger')
          return redirect(url_for('show', show_id=show_id))
 
-@app.route('/edit-show/<int:show_id>', methods=['POST'])
+@app.route('/delete-episode/<int:show_id>_<int:episode_id>')
 @login_required
-def edit_show(show_id):
-   if current_user.type != 'creatore':
+def delete_episode(show_id, episode_id):
+   if current_user.type!='creatore':
       flash('Non disponi dei privilegi necessari per eseguire ques\'azione', 'danger')
-      return redirect(url_for('profile'))
-   #TODO
-   return redirect(url_for('show', show_id=show_id))
-
-@app.route('/delete-show/<int:show_id>')
-@login_required
-def delete_show(show_id):
-   if current_user.type != 'creatore':
-      flash('Non disponi dei privilegi necessari per eseguire ques\'azione', 'danger')
-      return redirect(url_for('profile'))
-   success=dao.delete_show(show_id)
+      return redirect(url_for('show', show_id=show_id))
+   
+   success=dao.delete_episode_by_id(episode_id)
+   
    if success:
-      flash('Eliminazione della serie avvenuta correttamente','success')
-      return redirect(url_for('profile'))
+      flash('Elimazione dell\'episodio avvenuta correttamente', 'success')
+      return redirect(url_for('show', show_id=show_id))
    else:
-      flash('Errore nell\'eliminazione della serie','danger')
-      return redirect(url_for('profile'))
+      flash('Errore nell\'eliminazione dell\'episodio', 'danger')
+      return redirect(url_for('show', show_id=show_id))
 
+#COMMENTI
+@app.route('/new-comment/<int:show_id>_<int:episode_id>', methods=["POST"])
+@login_required
+def add_comment(show_id,episode_id):
+   return redirect(url_for('show', show_id=show_id))
+   
+   
+   
 app.run(port=5000, debug=True)

@@ -1,5 +1,6 @@
 import sqlite3
 
+#RICHIESTE PER PAGINA HOME
 def get_all_categories():
    conn=sqlite3.connect('db/podcast.db')
    conn.row_factory = sqlite3.Row
@@ -26,6 +27,8 @@ def get_all_shows():
    conn.close()
    return shows
 
+
+#RICHIESTE PER MECCANISMO LOGIN
 def get_user_by_email(email):
    conn=sqlite3.connect('db/podcast.db')
    conn.row_factory = sqlite3.Row
@@ -71,6 +74,8 @@ def add_user(new_user):
    
    return success
 
+
+# RICHIESTE PER PAGINA DI UNA SERIE
 def get_show_by_id(id):
    conn=sqlite3.connect('db/podcast.db')
    conn.row_factory = sqlite3.Row
@@ -95,6 +100,21 @@ def get_episodes_by_show_id(show_id):
    conn.close()
    return episodi
 
+def get_comments_by_show_id(show_id):
+   conn=sqlite3.connect('db/podcast.db')
+   conn.row_factory=sqlite3.Row
+   cursor=conn.cursor()
+   
+   sql='SELECT * FROM commenti WHERE show_id=?'
+   cursor.execute(sql, (show_id,))
+   commenti=cursor.fetchall()
+   cursor.close()
+   conn.close()
+   
+   return commenti
+
+
+# CREA, MODIFICA, ELIMINA SERIE
 def add_show(new_show):
    conn=sqlite3.connect('db/podcast.db')
    conn.row_factory = sqlite3.Row
@@ -116,6 +136,48 @@ def add_show(new_show):
    
    return success
 
+def edit_show(new_show):
+   conn=sqlite3.connect('db/podcast.db')
+   conn.row_factory = sqlite3.Row
+   cursor=conn.cursor()
+   success=False
+   
+   sql='UPDATE serie SET title=?, category=?, image=?, creator_id=?, description=?, creator_name=? WHERE id=?'
+ 
+   try:
+      cursor.execute(sql, (new_show['title'], new_show['category'], new_show['image'], new_show['creator_id'], new_show["description"], new_show["creator_name"], new_show["id"]))
+      conn.commit()
+      success = True
+   except Exception as e:
+      print('ERROR', str(e))
+      conn.rollback()
+
+   cursor.close()
+   conn.close()
+   
+   return success
+
+def delete_show(show_id):
+   conn=sqlite3.connect('db/podcast.db')
+   conn.row_factory=sqlite3.Row
+   cursor=conn.cursor()
+   success=False
+   sql='DELETE FROM serie WHERE id=?'
+   try:
+      cursor.execute(sql, (show_id,))
+      conn.commit()
+      success = True
+   except Exception as e:
+      print('ERROR', str(e))
+      conn.rollback()
+
+   cursor.close()
+   conn.close()
+   
+   return success
+
+
+# RICHIESTE PER PAGINA PROFILO
 def get_my_shows(creator_id):
    conn=sqlite3.connect('db/podcast.db')
    conn.row_factory = sqlite3.Row
@@ -141,19 +203,8 @@ def get_followed_shows(user_id):
    conn.close()
    return serie
 
-def get_comments_by_show_id(show_id):
-   conn=sqlite3.connect('db/podcast.db')
-   conn.row_factory=sqlite3.Row
-   cursor=conn.cursor()
-   
-   sql='SELECT * FROM commenti WHERE show_id=?'
-   cursor.execute(sql, (show_id,))
-   commenti=cursor.fetchall()
-   cursor.close()
-   conn.close()
-   
-   return commenti
 
+#SEGUI E SMETTI DI SEGUIRE
 def add_followed_show(show_id,user_id):
    conn=sqlite3.connect('db/podcast.db')
    conn.row_factory=sqlite3.Row
@@ -192,6 +243,8 @@ def remove_followed_show(show_id, user_id):
    
    return success
 
+
+# CREA, MODIFICA, ELIMINA EPISODIO
 def add_new_episode(episode,show_id):
    conn=sqlite3.connect('db/podcast.db')
    conn.row_factory=sqlite3.Row
@@ -211,14 +264,14 @@ def add_new_episode(episode,show_id):
    
    return success
 
-def delete_show(show_id):
+def delete_episode_by_id(episode_id):
    conn=sqlite3.connect('db/podcast.db')
    conn.row_factory=sqlite3.Row
    cursor=conn.cursor()
    success=False
-   sql='DELETE FROM serie WHERE id=?'
+   sql='DELETE FROM episodi WHERE id=?'
    try:
-      cursor.execute(sql, (show_id,))
+      cursor.execute(sql, (episode_id,))
       conn.commit()
       success = True
    except Exception as e:
@@ -229,3 +282,4 @@ def delete_show(show_id):
    conn.close()
    
    return success
+
