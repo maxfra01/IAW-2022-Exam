@@ -25,7 +25,8 @@
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0"></ul>
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        </ul>
         {% if current_user.is_authenticated %}
         <a class="navbar-brand welcome">Bentornato {{current_user.name}}!</a>
         <a href="{{url_for('profile')}}" type="button" class="btn btn-outline-light" title="Profilo"><i
@@ -168,41 +169,188 @@
     </div>
   </div>
 
-   <!--MODALE PER MODIFICARE SERIE-->
-   <div class="modal fade" id="edit-show-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-   aria-labelledby="staticBackdropLabel" aria-hidden="true">
-   <div class="modal-dialog">
-     <div class="modal-content">
-       <div class="modal-header">
-         <h1 class="modal-title fs-5" id="staticBackdropLabel">Modifica la serie</h1>
-         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-       </div>
-       <div class="modal-body">
-         <form action="edit-show/{{serie.id}}" enctype="multipart/form-data" method="post">
-           <div class="mb-3">
-             <label for="title" class="form-label">Titolo</label>
-             <input type="text"required class="form-control" name="title" aria-describedby="Titolo della serie" value="{{serie.title}}">
-           </div>
-           <div class="mb-3">
-             <label for="category" class="form-label">Categoria</label>
-             <input type="text" required class="form-control" name="category" aria-describedby="Categoria della serie" value="{{serie.category}}">
-           </div>
-           <div class="mb-3">
-             <label for="description" class="form-label">Descrizione</label>
-             <input type="text" required class="form-control" name="description" aria-describedby="Descrizione della serie" value="{{serie.description}}">
-           </div>
-           <div class="mb-3">
-             <label for="image" class="form-label">Copertina (Non caricare nulla per lasciare inalterato)</label>
-             <input type="file"   class="form-control" name="image" aria-describedby="Immagine della serie">
-           </div>
-       </div>
-       <div class="modal-footer">
-         <button type="submit" class="btn btn-outline-success">Modifica la serie</button>
-         </form>
-       </div>
-     </div>
-   </div>
- </div>
+  <!--MODALE PER MODIFICA EPISODIO-->
+  <div class="modal fade" id="edit-episode-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="staticBackdropLabel">Modifica episodio</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="edit-episode-form" action="" enctype="multipart/form-data" method="post">
+            <div class="mb-3">
+              <label for="title" class="form-label">Titolo</label>
+              <input type="text" required id="title-input" class="form-control" name="title"
+                aria-describedby="Titolo dell'episodio">
+            </div>
+            <div class="mb-3">
+              <label for="description" class="form-label">Descrizione</label>
+              <input type="text" id="description-input" required class="form-control" name="description"
+                aria-describedby="Descrizione dell'episodio">
+            </div>
+            <div class="mb-3">
+              <label for="audio" class="form-label">Traccia audio (in formato .mp3), lasciare vuoto per non modificare
+                la traccia precedente</label>
+              <input type="file" class="form-control" name="audio" aria-describedby="Traccia audio dell'episodio">
+            </div>
+            <div class="mb-3">
+              <label for="date" class="form-label">Data</label>
+              <input type="date" required id="date-input" class="form-control" name="date"
+                aria-describedby="Data di creazione dell'episodio">
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-outline-success">Modifica</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--MODALE PER MODIFICARE SERIE-->
+  <div class="modal fade" id="edit-show-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="staticBackdropLabel">Modifica la serie</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="edit-show/{{serie.id}}" enctype="multipart/form-data" method="post">
+            <div class="mb-3">
+              <label for="title" class="form-label">Titolo</label>
+              <input type="text" required class="form-control" name="title" aria-describedby="Titolo della serie"
+                value="{{serie.title}}">
+            </div>
+            <div class="mb-3">
+              <label for="category" class="form-label">Categoria</label>
+              <input type="text" required class="form-control" name="category" aria-describedby="Categoria della serie"
+                value="{{serie.category}}">
+            </div>
+            <div class="mb-3">
+              <label for="description" class="form-label">Descrizione</label>
+              <input type="text" required class="form-control" name="description"
+                aria-describedby="Descrizione della serie" value="{{serie.description}}">
+            </div>
+            <div class="mb-3">
+              <label for="image" class="form-label">Copertina (Non caricare nulla per lasciare inalterato)</label>
+              <input type="file" class="form-control" name="image" aria-describedby="Immagine della serie">
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-outline-success">Modifica la serie</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--MODALE PER NUOVO COMMENTO-->
+  <div class="modal fade" id="new-comment-modal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Nuovo commento</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="/new-comment/{{serie.id}}_" id="new-comment-form" method="post">
+            <div class="mb-3">
+
+              <label for="episode">Episodio</label>
+              <input type="text" id="episode-field" class="form-control" disabled>
+            </div>
+            <div class="mb-3">
+              <label for="comment">Commento</label>
+              <textarea required class="form-control" placeholder="Lascia un commento" name="comment"></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-success">Invia</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--MODALE PER MODIFICARE COMMENTO-->
+  <div class="modal fade" id="edit-comment-modal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Modifica il commento</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form action="/edit-comment/{{serie.id}}_" id="edit-comment-form" method="post">
+            <div class="mb-3">
+              <label for="episode">Episodio</label>
+              <input type="text" id="episode-field" class="form-control" disabled>
+            </div>
+            <div class="mb-3">
+              <label for="comment">Commento</label>
+              <textarea required id="old-comment-text" class="form-control" placeholder="Lascia un commento"
+                name="comment"></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-success">Invia</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--MODALE CONFERMA ELIMINAZIONE COMMENTO-->
+  <div class="modal fade" id="delete-comment-modal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Vuoi davvero eliminare il tuo commento?</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>L'azione è irreversibile e non potrai recuperare il contenuto.</p>
+        </div>
+        <div class="modal-footer">
+          <form action="/delete-comment/{{serie.id}}_" id="delete-comment-form" method="post">
+            <button type="button" class="btn " data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-danger">Elimina</button>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--MODALE CONFERMA ELIMINAZIONE EPISODIO-->
+  <div class="modal fade" id="delete-episode-modal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Vuoi davvero eliminare l'episodio?</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p>L'azione è irreversibile e non potrai recuperare il contenuto.</p>
+        </div>
+        <div class="modal-footer">
+          <form action="/delete-episode/{{serie.id}}_" id="delete-episode-form" method="post">
+            <button type="button" class="btn " data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-danger">Elimina</button>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <header>
     {% if current_user.id==serie.creator_id %}
@@ -258,19 +406,25 @@
         </div>
         {% if current_user.is_authenticated %}
         <div class="col-1">
-          <a class="btn btn-outline-success"
-            href="{{url_for('add_comment', show_id=serie.id, episode_id=episodio.id)}}"><i
-              class="bi bi-chat-dots-fill"></i> Aggiungi commento</a>
-        </div>
-        <div class="col-1">
-          <a class="btn btn-outline-warning"><i class="bi bi-pencil-square"></i> Modifica episodio</a>
+          <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#new-comment-modal"
+            data-bs-episodetitle="{{episodio.title}}" data-bs-episodeid="{{episodio.id}}"
+            data-bs-showid="{{serie.id}}"><i class="bi bi-chat-dots-fill"></i></button>
         </div>
         {% endif %}
         {%if current_user.id==serie.creator_id %}
         <div class="col-1">
-          <a class="btn btn-outline-danger"
-            href="{{url_for('delete_episode', show_id=serie.id, episode_id=episodio.id)}}"><i class="bi bi-trash"></i>
-            Elimina episodio</a>
+          <button class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#edit-episode-modal"
+            data-bs-episodetitle="{{episodio.title}}" data-bs-episodeid="{{episodio.id}}" data-bs-showid="{{serie.id}}"
+            data-bs-description="{{episodio.description}}" data-bs-date="{{episodio.date}}">
+            <i class="bi bi-pencil-square"></i>
+            Modifica episodio
+          </button>
+          </a>
+        </div>
+        <div class="col-1">
+          <button class="btn btn-outline-danger" data-bs-target="#delete-episode-modal" data-bs-showid="{{serie.id}}"
+            data-bs-episodeid="{{episodio.id}}" data-bs-toggle="modal"><i class="bi bi-trash"></i>Elimina
+            episodio</button>
         </div>
         {% endif %}
         <div class="row">Commenti dell'episodio '{{episodio.title}}'</div>
@@ -280,8 +434,17 @@
           <div class="col-4">{{commento.text}}</div>
           <div class="col-2">di {{commento.author}}</div>
           {% if current_user.id==commento.user_id %}
-          <div class="col-1">Modifica commento</div>
-          <div class="col-1">Elimina commento</div>
+          <div class="col-1">
+            <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#edit-comment-modal"
+              data-bs-episodetitle="{{episodio.title}}" data-bs-commentid="{{commento.id}}"
+              data-bs-showid="{{serie.id}}" data-bs-commenttext="{{commento.text}}">
+              <i class="bi bi-pencil-square"></i>
+            </button>
+          </div>
+          <div class="col-1"><button class="btn btn-outline-warning" data-bs-toggle="modal"
+              data-bs-target="#delete-comment-modal" data-bs-commentid="{{commento.id}}" data-bs-showid="{{serie.id}}">
+              <i class="bi bi-trash"></i>
+            </button></div>
           {% endif %}
           {% endif %}
         </div>
@@ -292,6 +455,8 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
     crossorigin="anonymous"></script>
+  <script src="{{url_for('static', filename='show.js')}}"></script>
+
 </body>
 
 </html>

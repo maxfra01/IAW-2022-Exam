@@ -113,6 +113,18 @@ def get_comments_by_show_id(show_id):
    
    return commenti
 
+def get_episode_by_id(episode_id):
+   conn=sqlite3.connect('db/podcast.db')
+   conn.row_factory = sqlite3.Row
+   cursor=conn.cursor()
+   sql='SELECT * FROM episodi WHERE id=?'
+   cursor.execute(sql, (episode_id, ))
+   episodio=cursor.fetchone()
+   
+   cursor.close()
+   conn.close()
+   return episodio
+
 
 # CREA, MODIFICA, ELIMINA SERIE
 def add_show(new_show):
@@ -264,6 +276,25 @@ def add_new_episode(episode,show_id):
    
    return success
 
+def edit_episode_by_id(new_episode, episode_id):
+   conn=sqlite3.connect('db/podcast.db')
+   conn.row_factory=sqlite3.Row
+   cursor=conn.cursor()
+   success=False
+   sql='UPDATE episodi SET title=?, description=?, date=?, audio=? WHERE id=?'
+   try:
+      cursor.execute(sql, (new_episode['title'], new_episode['description'], new_episode['date'], new_episode['audio'], episode_id))
+      conn.commit()
+      success = True
+   except Exception as e:
+      print('ERROR', str(e))
+      conn.rollback()
+
+   cursor.close()
+   conn.close()
+   
+   return success
+
 def delete_episode_by_id(episode_id):
    conn=sqlite3.connect('db/podcast.db')
    conn.row_factory=sqlite3.Row
@@ -283,3 +314,60 @@ def delete_episode_by_id(episode_id):
    
    return success
 
+# COMMENTI
+def add_comment(new_comment):
+   conn=sqlite3.connect('db/podcast.db')
+   conn.row_factory=sqlite3.Row
+   cursor=conn.cursor()
+   success=False
+   sql='INSERT INTO commenti(show_id, episode_id, text, user_id, author) VALUES(?,?,?,?,?)'
+   try:
+      cursor.execute(sql, (new_comment['show_id'], new_comment['episode_id'], new_comment['text'], new_comment['user_id'], new_comment['author']))
+      conn.commit()
+      success = True
+   except Exception as e:
+      print('ERROR', str(e))
+      conn.rollback()
+
+   cursor.close()
+   conn.close()
+   
+   return success
+
+def edit_comment_by_id(commento, comment_id):
+   conn=sqlite3.connect('db/podcast.db')
+   conn.row_factory=sqlite3.Row
+   cursor=conn.cursor()
+   success=False
+   sql='UPDATE commenti SET text=? WHERE id=?'
+   try:
+      cursor.execute(sql, (commento, comment_id))
+      conn.commit()
+      success = True
+   except Exception as e:
+      print('ERROR', str(e))
+      conn.rollback()
+
+   cursor.close()
+   conn.close()
+   
+   return success
+
+def delete_comment_by_id(comment_id):
+   conn=sqlite3.connect('db/podcast.db')
+   conn.row_factory=sqlite3.Row
+   cursor=conn.cursor()
+   success=False
+   sql='DELETE from commenti WHERE id=?'
+   try:
+      cursor.execute(sql, (comment_id,))
+      conn.commit()
+      success = True
+   except Exception as e:
+      print('ERROR', str(e))
+      conn.rollback()
+
+   cursor.close()
+   conn.close()
+   
+   return success

@@ -86,7 +86,7 @@ def login():
             email=user_in_db['email'],
             password=user_in_db['password'],
             tipo=user_in_db['type'])
-         login_user(new,)
+         login_user(new,False)
          return redirect(url_for('profile'))
       
 @app.route('/logout')
@@ -214,7 +214,7 @@ def edit_show(show_id):
          flash('Errore nella modifica della serie', 'danger')
          return redirect(url_for('show', show_id=show_id))
 
-@app.route('/delete-show/<int:show_id>')
+@app.route('/delete-show/<int:show_id>', methods=["POST"])
 @login_required
 def delete_show(show_id):
    if current_user.type != 'creatore':
@@ -262,7 +262,43 @@ def add_episode(show_id):
          flash('Errore nel caricamento dell\'episodio', 'danger')
          return redirect(url_for('show', show_id=show_id))
 
-@app.route('/delete-episode/<int:show_id>_<int:episode_id>')
+@app.route('/edit-episode/<int:show_id>_<int:episode_id>', methods=["POST"])
+@login_required
+def edit_episode(show_id, episode_id):
+   if current_user.type != 'creatore':
+      flash('Non disponi dei privilegi necessari per eseguire ques\'azione', 'danger')
+      return redirect(url_for('profile'))
+   
+   old_episode=dao.get_episode_by_id(episode_id)
+   
+   if request.method=='POST':
+      titolo=request.form.get('title')
+      descrizione=request.form.get('description')
+      data=request.form.get('date')
+      audio=request.files['audio']
+      filename=old_episode['audio']
+      if audio:
+         filename=secure_filename(audio.filename)
+         audio.save('static/'+ filename)
+         
+      new_episode={
+         'show_id':show_id,
+         'title':titolo,
+         'description': descrizione,
+         'date': data,
+         'audio': filename
+      }
+      
+      success=dao.edit_episode_by_id(new_episode,episode_id)
+      
+      if success:
+         flash('Episodio modificato correttamente', 'success')
+         return redirect(url_for('show', show_id=show_id))
+      else:
+         flash('Errore nela modifica dell\'episodio', 'danger')
+         return redirect(url_for('show', show_id=show_id))
+
+@app.route('/delete-episode/<int:show_id>_<int:episode_id>', methods=["POST"])
 @login_required
 def delete_episode(show_id, episode_id):
    if current_user.type!='creatore':
@@ -282,8 +318,57 @@ def delete_episode(show_id, episode_id):
 @app.route('/new-comment/<int:show_id>_<int:episode_id>', methods=["POST"])
 @login_required
 def add_comment(show_id,episode_id):
-   return redirect(url_for('show', show_id=show_id))
+   if not current_user.is_authenticated:
+      flash('Per effettuare questa operazione devi essere registrato')
+      return redirect(url_for('show', show_id=show_id))
+   if request.method=="POST":
+      commento=request.form.get('comment')   
+      new_comment={
+         'text': commento,
+         'episode_id': episode_id,
+         'user_id': current_user.id,
+         'show_id': show_id,
+         'author': current_user.name + current_user.surname
+      }
+      
+      success=dao.add_comment(new_comment)
+      if success:
+         flash('Commento inserito correttamente','success')
+         return redirect(url_for('show', show_id=show_id))
+      else:
+         flash('Errore nell\'inserimento del commento, riprovare','danger')
+         return redirect(url_for('show', show_id=show_id))
+
+@app.route('/edit-comment/<int:show_id>_<int:comment_id>', methods=["POST"])
+@login_required
+def edit_comment(show_id, comment_id):
+   if not current_user.is_authenticated:
+      flash('Per effettuare questa operazione devi essere registrato')
+      return redirect(url_for('show', show_id=show_id))
+   if request.method=="POST":
+      commento=request.form.get('comment')   
+      success=dao.edit_comment_by_id(commento, comment_id)
+      if success:
+         flash('Commento modificato correttamente','success')
+         return redirect(url_for('show', show_id=show_id))
+      else:
+         flash('Errore nella modifica del commento, riprovare','danger')
+         return redirect(url_for('show', show_id=show_id))
+
+@app.route('/delete-comment/<int:show_id>_<int:comment_id>', methods=["POST"])
+def delete_comment(show_id, comment_id):
+   if not current_user.is_authenticated:
+      flash('Per effettuare questa operazione devi essere registrato')
+      return redirect(url_for('show', show_id=show_id))
    
+   success=dao.delete_comment_by_id(comment_id)
    
-   
+   if success:
+      flash('Commento eliminato correttamente', 'success')
+      return redirect(url_for('show', show_id=show_id))
+   else:
+      flash('Errore nell\'eliminazione del commento, riprovare', 'danger')
+      return redirect(url_for('show', show_id=show_id))
+      
+
 app.run(port=5000, debug=True)
