@@ -4,12 +4,18 @@
    padding: 0;
 }
 
+
+
 .welcome{
    font-size: medium !important;
 }
 
 a{
    text-decoration: none;
+}
+
+.category-list{
+   max-width: 20% !important;
 }
 
 .show-list{
@@ -71,7 +77,10 @@ img {
    margin: 5px;
 }
 
+/*classe custom per ricerca*/
+.highlighted{
 
+}
 
 /*profile.html*/
 

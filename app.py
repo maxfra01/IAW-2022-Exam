@@ -5,7 +5,7 @@ from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 import dao
 from models.User import User
-#flask
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'mistero'
 app.config['SESSION_TYPE'] = 'filesystem'
@@ -24,6 +24,13 @@ def home():
    serie=dao.get_all_shows()
    return render_template('home.html', categorie=categorie, serie=serie)
 
+@app.route('/<category>')
+def home_by_category(category):
+   if category=='all':
+      return redirect(url_for('home'))
+   categorie=dao.get_all_categories()
+   serie=dao.get_shows_by_category(category)
+   return render_template('home.html', categorie=categorie, serie=serie)
 
    
 @app.route("/show/<int:show_id>")
@@ -32,7 +39,8 @@ def show(show_id):
    episodi=dao.get_episodes_by_show_id(show_id)
    commenti=dao.get_comments_by_show_id(show_id)
    return render_template('show.html', serie=serie, episodi=episodi, commenti=commenti)
-   
+
+#LOGIN
 #TODO Validare campi
 @app.route("/signup", methods=["POST"])
 def signup():
@@ -66,8 +74,6 @@ def signup():
             flash('Errore nella registrazione, riprova!', 'danger')
 
    return redirect(url_for('home'))
-
-
 
 @app.route("/login", methods=["POST"])
 def login():
@@ -106,8 +112,6 @@ def load_user(user_id):
    tipo=db_user['type'])
    return user
 
-      
-
 @app.route('/profile')
 @login_required
 def profile():
@@ -118,10 +122,13 @@ def profile():
    else:
       return render_template('profile.html', serie_seguite=serie_seguite)            
       
-
+#SEGUIRE
 @app.route('/follow-show/<int:show_id>')
 @login_required
 def follow_a_show(show_id):
+   if not current_user.is_authenticated:
+      flash('Per effettuare questa operazione devi essere registrato','danger')
+      return redirect(url_for('show', show_id=show_id))
    success=dao.add_followed_show(show_id, current_user.id)
    if success:
       flash('Serie seguita correttamente','success')
@@ -134,6 +141,9 @@ def follow_a_show(show_id):
 @app.route('/unfollow-show/<int:show_id>')
 @login_required
 def unfollow_a_show(show_id):
+   if not current_user.is_authenticated:
+      flash('Per effettuare questa operazione devi essere registrato','danger')
+      return redirect(url_for('show', show_id=show_id))
    success=dao.remove_followed_show(show_id, current_user.id)
    if success:
       flash('Hai smesso di seguire la serie','success')
@@ -142,7 +152,7 @@ def unfollow_a_show(show_id):
       flash('Si è verificato un problema ', 'danger')
       return redirect(url_for('show', show_id=show_id))
 
-#CREARE, MODIFICARE SERIE
+#SERIE
 #TODO valida campi
 @app.route('/new-show',methods=["POST"])
 @login_required
@@ -172,7 +182,7 @@ def newshow():
       if success:
          
          flash('Creazione della serie avvenuta correttamente','success')
-         return redirect(url_for('home'))
+         return redirect(url_for('profile'))
       else:
          flash('Errore nella creazione della serie', 'danger')
          return redirect(url_for('profile'))
@@ -181,7 +191,7 @@ def newshow():
 @app.route('/show/edit-show/<int:show_id>', methods=['POST'])
 @login_required
 def edit_show(show_id):
-   if current_user.type != 'creatore':
+   if current_user.type != 'creatore' or not dao.check_show_author(show_id, current_user.id):
       flash('Non disponi dei privilegi necessari per eseguire ques\'azione', 'danger')
       return redirect(url_for('show', show_id=show_id))
    
@@ -217,7 +227,7 @@ def edit_show(show_id):
 @app.route('/delete-show/<int:show_id>', methods=["POST"])
 @login_required
 def delete_show(show_id):
-   if current_user.type != 'creatore':
+   if current_user.type != 'creatore' or not dao.check_show_author(show_id,current_user.id):
       flash('Non disponi dei privilegi necessari per eseguire ques\'azione', 'danger')
       return redirect(url_for('profile'))
    success=dao.delete_show(show_id)
@@ -228,12 +238,12 @@ def delete_show(show_id):
       flash('Errore nell\'eliminazione della serie','danger')
       return redirect(url_for('profile'))
 
-#AGGIUNGI, ELIMINA EPISODI
+#EPISODI
 #TODO valida campi
 @app.route('/new-episode/<int:show_id>', methods=["POST"])
 @login_required
 def add_episode(show_id):
-   if current_user.type != 'creatore':
+   if current_user.type != 'creatore' or not dao.check_show_author(show_id, current_user.id):
       flash('Non disponi dei privilegi necessari per eseguire ques\'azione', 'danger')
       return redirect(url_for('profile'))
    if request.method=='POST':
@@ -265,7 +275,7 @@ def add_episode(show_id):
 @app.route('/edit-episode/<int:show_id>_<int:episode_id>', methods=["POST"])
 @login_required
 def edit_episode(show_id, episode_id):
-   if current_user.type != 'creatore':
+   if current_user.type != 'creatore' or not dao.check_show_author(show_id, current_user.id):
       flash('Non disponi dei privilegi necessari per eseguire ques\'azione', 'danger')
       return redirect(url_for('profile'))
    
@@ -301,7 +311,7 @@ def edit_episode(show_id, episode_id):
 @app.route('/delete-episode/<int:show_id>_<int:episode_id>', methods=["POST"])
 @login_required
 def delete_episode(show_id, episode_id):
-   if current_user.type!='creatore':
+   if current_user.type!='creatore' or not dao.check_show_author(show_id, current_user.id):
       flash('Non disponi dei privilegi necessari per eseguire ques\'azione', 'danger')
       return redirect(url_for('show', show_id=show_id))
    
@@ -319,7 +329,7 @@ def delete_episode(show_id, episode_id):
 @login_required
 def add_comment(show_id,episode_id):
    if not current_user.is_authenticated:
-      flash('Per effettuare questa operazione devi essere registrato')
+      flash('Per effettuare questa operazione devi essere registrato','danger')
       return redirect(url_for('show', show_id=show_id))
    if request.method=="POST":
       commento=request.form.get('comment')   
@@ -328,7 +338,7 @@ def add_comment(show_id,episode_id):
          'episode_id': episode_id,
          'user_id': current_user.id,
          'show_id': show_id,
-         'author': current_user.name + current_user.surname
+         'author': current_user.name +' ' + current_user.surname
       }
       
       success=dao.add_comment(new_comment)
@@ -343,7 +353,10 @@ def add_comment(show_id,episode_id):
 @login_required
 def edit_comment(show_id, comment_id):
    if not current_user.is_authenticated:
-      flash('Per effettuare questa operazione devi essere registrato')
+      flash('Per effettuare questa operazione devi essere registrato','danger')
+      return redirect(url_for('show', show_id=show_id))
+   if not dao.check_comment_author(comment_id, current_user.id):
+      flash('Non disponi dei privilegi necessari per effettuare questa operazione','danger')
       return redirect(url_for('show', show_id=show_id))
    if request.method=="POST":
       commento=request.form.get('comment')   
@@ -360,7 +373,8 @@ def delete_comment(show_id, comment_id):
    if not current_user.is_authenticated:
       flash('Per effettuare questa operazione devi essere registrato')
       return redirect(url_for('show', show_id=show_id))
-   
+   if not dao.check_comment_author(comment_id, current_user.id):
+      flash('Non disponi dei privilegi necessari per effettuare questa operazione','danger')
    success=dao.delete_comment_by_id(comment_id)
    
    if success:
@@ -370,5 +384,4 @@ def delete_comment(show_id, comment_id):
       flash('Errore nell\'eliminazione del commento, riprovare', 'danger')
       return redirect(url_for('show', show_id=show_id))
       
-
 app.run(port=5000, debug=True)

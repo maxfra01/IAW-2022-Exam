@@ -19,7 +19,7 @@ def get_all_shows():
    conn.row_factory = sqlite3.Row
    cursor=conn.cursor()
    
-   sql='SELECT * FROM serie'
+   sql='SELECT * FROM serie ORDER BY title'
    cursor.execute(sql)
    shows=cursor.fetchall()
    
@@ -27,6 +27,18 @@ def get_all_shows():
    conn.close()
    return shows
 
+def get_shows_by_category(category):
+   conn=sqlite3.connect('db/podcast.db')
+   conn.row_factory = sqlite3.Row
+   cursor=conn.cursor()
+   
+   sql='SELECT * FROM serie WHERE category=? ORDER BY title'
+   cursor.execute(sql, (category,))
+   shows=cursor.fetchall()
+   
+   cursor.close()
+   conn.close()
+   return shows
 
 #RICHIESTE PER MECCANISMO LOGIN
 def get_user_by_email(email):
@@ -188,6 +200,21 @@ def delete_show(show_id):
    
    return success
 
+def check_show_author(show_id, user_id):
+   conn=sqlite3.connect('db/podcast.db')
+   conn.row_factory=sqlite3.Row
+   cursor=conn.cursor()
+   
+   sql='SELECT * FROM serie WHERE id=?'
+   cursor.execute(sql, (show_id,))
+   serie=cursor.fetchone()
+   cursor.close()
+   conn.close()
+   
+   success=False
+   if user_id == serie['creator_id']:
+      success=True
+   return success
 
 # RICHIESTE PER PAGINA PROFILO
 def get_my_shows(creator_id):
@@ -370,4 +397,20 @@ def delete_comment_by_id(comment_id):
    cursor.close()
    conn.close()
    
+   return success
+
+def check_comment_author(comment_id, user_id):
+   conn=sqlite3.connect('db/podcast.db')
+   conn.row_factory=sqlite3.Row
+   cursor=conn.cursor()
+   
+   sql='SELECT * FROM commenti WHERE id=?'
+   cursor.execute(sql, (comment_id,))
+   commento=cursor.fetchone()
+   cursor.close()
+   conn.close()
+   
+   success=False
+   if user_id == commento['user_id']:
+      success=True
    return success

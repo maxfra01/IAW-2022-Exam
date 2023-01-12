@@ -1,184 +1,129 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
+{% block title %}Profile{% endblock %}
 
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
-  <link rel="stylesheet" href="{{url_for('static', filename='home_style.css')}}">
-  <title>MyPodcast profile</title>
-</head>
+{% block content %}
 
-<body>
 
-  <!--INIZIO NAVBAR-->
-  <nav class="navbar navbar-expand bg-dark navbar-dark">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="{{url_for('home')}}">
-        MyPodcast
-        <i class="bi bi-mic"></i> </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
+
+
+
+<!--INIZIO CONTENUTO-->
+<main class="profile-main">
+  <div class="row">
+    <aside class="left-aside col-2">
+      <img src="{{url_for('static',filename='avatar.png')}}" alt="avatar">
+      <div class="row">{{current_user.name}} {{current_user.surname}}</div>
+      <div class="row">{{current_user.email}}</div>
+      <div class="row">Ruolo: {{current_user.type}}</div>
+      <p></p>
+      {%if current_user.type=='creatore' %}
+      <img src="{{url_for('static',filename='wrench.png')}}" alt="tools">
+      <!--BOTTONE TRIGGER DEL MODALE PER NUOVA SERIE-->
+      <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#new-show-modal">
+        <i class="bi bi-plus-circle-dotted"></i>
+        Nuova serie
       </button>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0"></ul>
-        {% if current_user.is_authenticated %}
-        <a class="navbar-brand welcome">Bentornato {{current_user.name}}!</a>
-        <a href="{{url_for('profile')}}" type="button" class="btn btn-outline-light" title="Profilo"><i
-            class="bi bi-person-lines-fill"></i> Profilo</a>
-        <a href="{{ url_for('logout') }}" type="button" class="btn btn-outline-light" title="Logout"><i
-            class="bi bi-box-arrow-left"></i> Logout</a>
-        {% endif %}
+      {% endif %}
+    </aside>
+
+    <aside class="right-aside col-9">
+      {% if current_user.type=='creatore' %}
+      <h1>Le mie serie</h1>
+      {% for serie in mie_serie %}
+      <div class="container text-center">
+        <div class="row">
+          <div class="col-4">
+            <a type="text" href="{{url_for('show',show_id=serie.id)}}">{{serie.title}}</a>
+          </div>
+          <div class="col-2">
+            <a type="text" class="btn btn-outline-warning" href="{{url_for('show',show_id=serie.id)}}"><i
+                class="bi bi-pencil-square"></i></a>
+          </div>
+          <div class="col-2">
+            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal"
+              data-bs-target="#delete-show-modal" data-bs-showid="{{serie.id}}"><i class="bi bi-trash"></i></button>
+          </div>
+        </div>
       </div>
-    </div>
-  </nav>
+      {% endfor%}
+      {%endif %}
 
-  <!--FLASH-->
-  {% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-  {% for category, message in messages %}
-  <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
-    {{ message }}
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-  </div>
-  {% endfor %}
-  {% endif %}
-  {% endwith %}
 
-  <!--INIZIO CONTENUTO-->
-  <main class="profile-main">
-    <div class="row">
-      <aside class="left-aside col-2">
-        <img src="{{url_for('static',filename='avatar.png')}}" alt="avatar">
-        <div class="row">{{current_user.name}} {{current_user.surname}}</div>
-        <div class="row">{{current_user.email}}</div>
-        <div class="row">Ruolo: {{current_user.type}}</div>
-        <p></p>
-        {%if current_user.type=='creatore' %}
-        <img src="{{url_for('static',filename='wrench.png')}}" alt="tools">
-        <!--BOTTONE TRIGGER DEL MODALE PER NUOVA SERIE-->
-        <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#new-show-modal">
-          <i class="bi bi-plus-circle-dotted"></i>
-          Nuova serie
-        </button>
-        {% endif %}
-      </aside>
-
-      <aside class="right-aside col-9">
-        {% if current_user.type=='creatore' %}
-        <h1>Le mie serie</h1>
-        {% for serie in mie_serie %}
-        <div class="container text-center">
-          <div class="row">
-            <div class="col-4">
-              <a type="text" href="{{url_for('show',show_id=serie.id)}}">{{serie.title}}</a>
-            </div>
-            <div class="col-2">
-              <a type="text" class="btn btn-outline-warning" href="{{url_for('show',show_id=serie.id)}}"><i
-                  class="bi bi-pencil-square"></i></a>
-            </div>
-            <div class="col-2">
-              <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal"
-                data-bs-target="#delete-show-modal" data-bs-showid="{{serie.id}}"><i class="bi bi-trash"></i></button>
-            </div>
+      <h1>Serie seguite</h1>
+      {% for serie in serie_seguite %}
+      <div class="container text-center">
+        <div class="row">
+          <div class="col-4"><a type="text" href="{{url_for('show',show_id=serie.id)}}">{{serie.title}}</a></div>
+          <div class="col-2">
+            <a class="btn btn-outline-danger" href="{{url_for('unfollow_a_show', show_id=serie.id)}}">Smetti di
+              seguire</a>
           </div>
         </div>
         {% endfor%}
-        {%endif %}
 
+      </div>
+    </aside>
+  </div>
+</main>
 
-        <h1>Serie seguite</h1>
-        {% for serie in serie_seguite %}
-        <div class="container text-center">
-          <div class="row">
-            <div class="col-4"><a type="text" href="{{url_for('show',show_id=serie.id)}}">{{serie.title}}</a></div>
-            <div class="col-2">
-              <a class="btn btn-outline-danger" href="{{url_for('unfollow_a_show', show_id=serie.id)}}">Smetti di
-                seguire</a>
-            </div>
+<!--MODALE PER NUOVA SERIE-->
+<div class="modal fade" id="new-show-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="staticBackdropLabel">Crea una nuova serie</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="new-show" enctype="multipart/form-data" method="post">
+          <div class="mb-3">
+            <label for="title" class="form-label">Titolo</label>
+            <input type="text" required class="form-control" name="title" aria-describedby="Titolo della serie">
           </div>
-          {% endfor%}
-
-        </div>
-      </aside>
-    </div>
-  </main>
-
-
-
-
-
-  <!--MODALE PER NUOVA SERIE-->
-  <div class="modal fade" id="new-show-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-    aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="staticBackdropLabel">Crea una nuova serie</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form action="new-show" enctype="multipart/form-data" method="post">
-            <div class="mb-3">
-              <label for="title" class="form-label">Titolo</label>
-              <input type="text" required class="form-control" name="title" aria-describedby="Titolo della serie">
-            </div>
-            <div class="mb-3">
-              <label for="category" class="form-label">Categoria</label>
-              <input type="text" required class="form-control" name="category" aria-describedby="Categoria della serie">
-            </div>
-            <div class="mb-3">
-              <label for="description" class="form-label">Descrizione</label>
-              <input type="text" required class="form-control" name="description"
-                aria-describedby="Descrizione della serie">
-            </div>
-            <div class="mb-3">
-              <label for="image" class="form-label">Copertina</label>
-              <input type="file" required class="form-control" name="image" aria-describedby="Immagine della serie">
-            </div>
-        </div>
-        <div class="modal-footer">
-          <button type="submit" class="btn btn-outline-success">Crea la serie</button>
-          </form>
-        </div>
+          <div class="mb-3">
+            <label for="category" class="form-label">Categoria</label>
+            <input type="text" required class="form-control" name="category" aria-describedby="Categoria della serie">
+          </div>
+          <div class="mb-3">
+            <label for="description" class="form-label">Descrizione</label>
+            <textarea name="description" required class="form-control"
+              aria-describedby="Descrizione della serie"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="image" class="form-label">Copertina</label>
+            <input type="file" required class="form-control" name="image" aria-describedby="Immagine della serie">
+          </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-outline-success">Crea la serie</button>
+        </form>
       </div>
     </div>
   </div>
+</div>
 
+<!--MODALE CONFERMA ELIMINAZIONE SERIE-->
+<div class="modal fade" id="delete-show-modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Vuoi davvero eliminare la serie?</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>L'azione è irreversibile e non potrai recuperare il contenuto, inclusi episodi e commenti.</p>
+      </div>
+      <div class="modal-footer">
+        <form action="/delete-show/" id="delete-show-form" method="post">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-danger">Elimina</button>
 
-
-  <!--MODALE CONFERMA ELIMINAZIONE SERIE-->
-  <div class="modal" id="delete-show-modal">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Vuoi davvero eliminare la serie?</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <p>L'azione è irreversibile e non potrai recuperare il contenuto, inclusi episodi e commenti.</p>
-        </div>
-        <div class="modal-footer">
-          <form action="/delete-show/" id="delete-show-form" method="post">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-danger">Elimina</button>
-
-          </form>
-        </div>
+        </form>
       </div>
     </div>
   </div>
+</div>
 
-
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
-    crossorigin="anonymous"></script>
-  <script src="{{url_for('static', filename='profile.js')}}"></script>
-</body>
-
-</html>
+<script src="{{url_for('static', filename='profile.js')}}"></script>
+{% endblock %}

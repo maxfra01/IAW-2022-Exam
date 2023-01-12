@@ -1,0 +1,52 @@
+* {
+   font-family: Verdana, Geneva, Tahoma, sans-serif;
+   border: 0;
+   padding: 0;
+}
+
+.welcome{
+   font-size: small !important;
+}
+
+a{
+   text-decoration: none;
+}
+
+img {
+   width: 150px;
+   height: 150px;
+   border-radius: 5%;
+}
+
+.show-container {
+   margin: 10px;
+   border-bottom: solid gray 1px;
+   padding: 10px;
+  
+}
+.show-list{
+   margin: 20px;
+}
+
+.show-description{
+margin-top: 10px;
+}
+
+.cat-aside{
+   padding: 10px;
+   margin: 20px;
+   height:100%;
+}
+
+.cat-aside > a:hover{
+   text-decoration: underline;
+}
+
+.dropdown-item{
+   margin-top: 10px;
+   margin-bottom: 10px;
+}
+
+.tag{
+   margin-bottom: 0px;
+}
