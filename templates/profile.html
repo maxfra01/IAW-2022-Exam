@@ -3,71 +3,68 @@
 
 {% block content %}
 
+<aside class="account-info col-2">
+  <p class="fw-bold fs-4 text-wrap mb-3">I miei dati <i class="bi bi-person-vcard"></i></p>
+  <p class="text-wrap mb-2">{{current_user.name}} {{current_user.surname}}</p>
+  <p class="text-wrap mb-2">{{current_user.email}}</p>
+  <p class="text-wrap">Ruolo: {{current_user.type}}</p>
+</aside>
 
-
-
-
-<!--INIZIO CONTENUTO-->
-<main class="profile-main">
-  <div class="row">
-    <aside class="left-aside col-2">
-      <img src="{{url_for('static',filename='avatar.png')}}" alt="avatar">
-      <div class="row">{{current_user.name}} {{current_user.surname}}</div>
-      <div class="row">{{current_user.email}}</div>
-      <div class="row">Ruolo: {{current_user.type}}</div>
-      <p></p>
-      {%if current_user.type=='creatore' %}
-      <img src="{{url_for('static',filename='wrench.png')}}" alt="tools">
-      <!--BOTTONE TRIGGER DEL MODALE PER NUOVA SERIE-->
-      <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#new-show-modal">
-        <i class="bi bi-plus-circle-dotted"></i>
-        Nuova serie
-      </button>
-      {% endif %}
-    </aside>
-
-    <aside class="right-aside col-9">
-      {% if current_user.type=='creatore' %}
-      <h1>Le mie serie</h1>
-      {% for serie in mie_serie %}
-      <div class="container text-center">
-        <div class="row">
-          <div class="col-4">
-            <a type="text" href="{{url_for('show',show_id=serie.id)}}">{{serie.title}}</a>
-          </div>
-          <div class="col-2">
-            <a type="text" class="btn btn-outline-warning" href="{{url_for('show',show_id=serie.id)}}"><i
-                class="bi bi-pencil-square"></i></a>
-          </div>
-          <div class="col-2">
-            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal"
-              data-bs-target="#delete-show-modal" data-bs-showid="{{serie.id}}"><i class="bi bi-trash"></i></button>
-          </div>
+<main class=" col-6" id="show-profile-list">
+  {% if current_user.type=='creatore' %}
+  <article id="creator-section" class="mb-5">
+    <p class="fw-bold fs-4">Le mie serie</p>
+    {% for serie in mie_serie %}
+    <div class="episode-row row d-flex align-items-center">
+      <div class="col-2 justify-content-center">
+        <img class="episode-image-profile" src="{{url_for('static',filename=serie.image)}}" alt="immagine di {{serie.title}}">
+      </div>
+      <div class="col-7">
+        <a type="text" href="{{url_for('show',show_id=serie.id)}}">{{serie.title}}</a>
+      </div>
+      <div class="col-3">
+        <div class="d-flex flex-row justify-content-end ">
+          <a type="text" class="btn btn-outline-warning me-2" href="{{url_for('show',show_id=serie.id)}}"><i
+            class="bi bi-pencil-square"></i></a>
+            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#delete-show-modal"
+          data-bs-showid="{{serie.id}}"><i class="bi bi-trash"></i></button>
         </div>
       </div>
+    </div>
+    {% endfor%}
+    <div class="episode-row d-flex justify-content-center">
+      <a class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#new-show-modal">Nuova <i class="bi bi-plus-square-dotted"></i></a>
+    </div>
+  </article>
+  {%endif %}
+
+  <article id="non-creator-section">
+    <p class="fw-bold fs-4">Serie seguite</p>
+    {% for serie in serie_seguite %}
+    <div class="episode-row row d-flex align-items-center">
+      <div class="col-2 justify-content-center">
+        <img class="episode-image-profile" src="{{url_for('static',filename=serie.image)}}" alt="immagine di {{serie.title}}">
+      </div>
+      <div class="col-7">
+        <a type="text" href="{{url_for('show',show_id=serie.id)}}">{{serie.title}}</a>
+      </div>
+      <div class="d-flex justify-content-end col-3">
+         <a class="btn btn-outline-danger" href="{{url_for('unfollow_a_show', show_id=serie.id)}}">Non
+          seguire
+        </a>
+      </div>
+    </div>
       {% endfor%}
-      {%endif %}
-
-
-      <h1>Serie seguite</h1>
-      {% for serie in serie_seguite %}
-      <div class="container text-center">
-        <div class="row">
-          <div class="col-4"><a type="text" href="{{url_for('show',show_id=serie.id)}}">{{serie.title}}</a></div>
-          <div class="col-2">
-            <a class="btn btn-outline-danger" href="{{url_for('unfollow_a_show', show_id=serie.id)}}">Smetti di
-              seguire</a>
-          </div>
-        </div>
-        {% endfor%}
-
+      <div class="episode-row d-flex justify-content-center">
+       <a class="btn btn-success" href="{{url_for('home')}}">Scopri <i class="bi bi-plus-square-dotted"></i></a>
       </div>
-    </aside>
-  </div>
+  </article>
+
 </main>
 
+
 <!--MODALE PER NUOVA SERIE-->
-<div class="modal fade" id="new-show-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+<div class="modal fade" id="new-show-modal"  data-bs-keyboard="false" tabindex="-1"
   aria-labelledby="staticBackdropLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -96,7 +93,8 @@
           </div>
       </div>
       <div class="modal-footer">
-        <button type="submit" class="btn btn-outline-success">Crea la serie</button>
+        <button type="button" class="btn btn-secondary " data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-success">Crea la serie</button>
         </form>
       </div>
     </div>
@@ -112,7 +110,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <p>L'azione è irreversibile e non potrai recuperare il contenuto, inclusi episodi e commenti.</p>
+        <p class="fw-bold">L'azione è irreversibile e non potrai recuperare il contenuto, inclusi episodi e commenti.</p>
       </div>
       <div class="modal-footer">
         <form action="/delete-show/" id="delete-show-form" method="post">

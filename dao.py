@@ -137,6 +137,21 @@ def get_episode_by_id(episode_id):
    conn.close()
    return episodio
 
+def check_followed_show(user_id, show_id):
+   conn=sqlite3.connect('db/podcast.db')
+   conn.row_factory=sqlite3.Row
+   cursor=conn.cursor()
+   
+   sql='SELECT * FROM seguiti WHERE id_user=? AND id_show=?'
+   cursor.execute(sql, (user_id,show_id))
+   riga=cursor.fetchone()
+   cursor.close()
+   conn.close()
+   
+   if riga:
+      return 1
+   return 0
+
 
 # CREA, MODIFICA, ELIMINA SERIE
 def add_show(new_show):
@@ -184,6 +199,7 @@ def edit_show(new_show):
 def delete_show(show_id):
    conn=sqlite3.connect('db/podcast.db')
    conn.row_factory=sqlite3.Row
+   conn.execute('PRAGMA foreign_keys=1')
    cursor=conn.cursor()
    success=False
    sql='DELETE FROM serie WHERE id=?'
@@ -325,6 +341,7 @@ def edit_episode_by_id(new_episode, episode_id):
 def delete_episode_by_id(episode_id):
    conn=sqlite3.connect('db/podcast.db')
    conn.row_factory=sqlite3.Row
+   conn.execute('PRAGMA foreign_keys=1')
    cursor=conn.cursor()
    success=False
    sql='DELETE FROM episodi WHERE id=?'
@@ -383,6 +400,7 @@ def edit_comment_by_id(commento, comment_id):
 def delete_comment_by_id(comment_id):
    conn=sqlite3.connect('db/podcast.db')
    conn.row_factory=sqlite3.Row
+   conn.execute('PRAGMA foreign_keys=1')
    cursor=conn.cursor()
    success=False
    sql='DELETE from commenti WHERE id=?'

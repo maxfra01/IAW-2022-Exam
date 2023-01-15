@@ -4,6 +4,8 @@ from flask_session import Session
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 import dao
+from datetime import datetime
+import re
 from models.User import User
 
 app = Flask(__name__)
@@ -18,11 +20,23 @@ login_manager.login_message = 'Accedi per visualizzare questa pagina'
 login_manager.login_message_category = 'warning'
 login_manager.init_app(app)
 
+def check_name(name):
+   clear_name=name.strip('!\"\'\\£$%&/()=?^,.;:-_')
+   if clear_name != name:
+      return False
+   return True
+def check_email(email):
+   regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+   if re.fullmatch(regex, email):
+      return True
+   return False
+
+#HOME E SERIE
 @app.route("/")
 def home():
    categorie=dao.get_all_categories()  
    serie=dao.get_all_shows()
-   return render_template('home.html', categorie=categorie, serie=serie)
+   return render_template('home.html', categorie=categorie, serie=serie,active_category='all')
 
 @app.route('/<category>')
 def home_by_category(category):
@@ -30,7 +44,7 @@ def home_by_category(category):
       return redirect(url_for('home'))
    categorie=dao.get_all_categories()
    serie=dao.get_shows_by_category(category)
-   return render_template('home.html', categorie=categorie, serie=serie)
+   return render_template('home.html', categorie=categorie, serie=serie, active_category=category)
 
    
 @app.route("/show/<int:show_id>")
@@ -38,23 +52,35 @@ def show(show_id):
    serie=dao.get_show_by_id(show_id)
    episodi=dao.get_episodes_by_show_id(show_id)
    commenti=dao.get_comments_by_show_id(show_id)
-   return render_template('show.html', serie=serie, episodi=episodi, commenti=commenti)
+   seguita=0
+   if current_user.is_authenticated:
+      seguita= dao.check_followed_show(current_user.id,show_id)
+   return render_template('show.html', serie=serie, episodi=episodi, commenti=commenti, follow=seguita)
 
 #LOGIN
-#TODO Validare campi
 @app.route("/signup", methods=["POST"])
 def signup():
+   success=True
    if request.method=="POST":
       name = request.form.get('name')
+      if not check_name(name):
+         flash('Errore, inserisci dei dati validi', 'danger')
+         return redirect(url_for('home'))
       surname=request.form.get('surname')
+      if not check_name(surname):
+         flash('Errore, inserisci dei dati validi', 'danger')
+         return redirect(url_for('home'))
       email = request.form.get('email')
+      if not check_email(email):
+         flash('Errore, inserisci dei dati validi', 'danger')
+         return redirect(url_for('home'))
       tipo=request.form.get('type')
       password = request.form.get("password")
 
       user_in_db = dao.get_user_by_email(email)
 
       if user_in_db:
-         flash('C\'è già un utente registrato con questa email', 'danger')
+         flash('Errore, C\'è già un utente registrato con questa email', 'danger')
          return redirect(url_for('home'))
       else:
          new_user = {
@@ -79,8 +105,10 @@ def signup():
 def login():
    if request.method=="POST":
       email=request.form.get("email")
+      if not check_email(email):
+         flash('Errore, inserisci dei dati validi', 'danger')
+         return redirect(url_for('home'))
       password=request.form.get("password")
-      tipo=request.form.get("type") 
       user_in_db=dao.get_user_by_email(email)
       if not user_in_db or not check_password_hash(user_in_db["password"], password):
          flash("Credenziali non valide", 'danger')
@@ -153,7 +181,7 @@ def unfollow_a_show(show_id):
       return redirect(url_for('show', show_id=show_id))
 
 #SERIE
-#TODO valida campi
+
 @app.route('/new-show',methods=["POST"])
 @login_required
 def newshow():
@@ -162,10 +190,22 @@ def newshow():
       return redirect(url_for('profile'))
    if request.method=='POST':
       titolo=request.form.get('title')
+      if not titolo.strip():
+         flash('Errore, inserisci dei dati validi', 'danger')
+         return redirect(url_for('profile'))
       categoria=request.form.get('category')
+      if not categoria.strip():
+         flash('Errore, inserisci dei dati validi', 'danger')
+         return redirect(url_for('profile'))
       description=request.form.get('description')
+      if not description.strip():
+         flash('Errore, inserisci dei dati validi', 'danger')
+         return redirect(url_for('profile'))
       image=request.files['image']
       filename = secure_filename(image.filename)
+      if not filename.endswith('.jpg') :
+         flash('Errore, carica un\'immagine valida', 'danger')
+         return redirect(url_for('profile'))
       if image:
          image.save('static/' + filename)
       
@@ -187,7 +227,7 @@ def newshow():
          flash('Errore nella creazione della serie', 'danger')
          return redirect(url_for('profile'))
 
-#TODO valida campi
+
 @app.route('/show/edit-show/<int:show_id>', methods=['POST'])
 @login_required
 def edit_show(show_id):
@@ -197,13 +237,28 @@ def edit_show(show_id):
    
    if request.method=='POST':
       old_show=dao.get_show_by_id(show_id)
+      
       nuovo_titolo=request.form.get('title')
+      if not nuovo_titolo.strip():
+         flash('Errore, inserisci dei dati validi', 'danger')
+         return redirect(url_for('show', show_id=show_id))
+      
       nuovo_categoria=request.form.get('category')
+      if not nuovo_categoria.strip():
+         flash('Errore, inserisci dei dati validi', 'danger')
+         return redirect(url_for('show', show_id=show_id))
+      
       nuova_descrizione=request.form.get('description')
+      if not nuova_descrizione.strip():
+         flash('Errore, inserisci dei dati validi', 'danger')
+         return redirect(url_for('show', show_id=show_id))
+      
       nuova_immagine=request.files['image']
       filename=old_show['image']
       if nuova_immagine:
          filename = secure_filename(nuova_immagine.filename)
+         if not filename.endswith('.jpg'):
+            flash('Errore, carica un\'immagine valida','danger')
          nuova_immagine.save('static/' + filename)
       
       new_show={'id': old_show['id'], 
@@ -239,7 +294,6 @@ def delete_show(show_id):
       return redirect(url_for('profile'))
 
 #EPISODI
-#TODO valida campi
 @app.route('/new-episode/<int:show_id>', methods=["POST"])
 @login_required
 def add_episode(show_id):
@@ -248,13 +302,34 @@ def add_episode(show_id):
       return redirect(url_for('profile'))
    if request.method=='POST':
       titolo=request.form.get('title')
+      if not titolo.strip():
+         flash('Errore, inserisci dei dati validi', 'danger')
+         return redirect(url_for('show', show_id=show_id))
       descrizione=request.form.get('description')
+      if not descrizione.strip():
+         flash('Errore, inserisci dei dati validi', 'danger')
+         return redirect(url_for('show', show_id=show_id))
       data=request.form.get('date')
+      
+      if not data:
+         flash('Errore, inserisci dei dati validi', 'danger')
+         return redirect(url_for('show', show_id=show_id))
+        
+      today=datetime.now()
+      if datetime.strptime(data,'%Y-%m-%d') > today:
+         flash('Errore, non puoi inserire date oltre quella odierna','danger')
+         return redirect(url_for('show', show_id=show_id))
+      
       audio=request.files['audio']
       filename=secure_filename(audio.filename)
       if audio:
-         audio.save('static/'+ filename)
-         
+         if not filename.endswith('.mp3'):
+            flash('Errore, carica un file valido', 'danger')
+            return redirect(url_for('show', show_id=show_id))
+         audio.save('static/audio/'+ filename)
+      else:
+         flash('Errore, carica un file valido', 'danger')
+         return redirect(url_for('show', show_id=show_id))
       new_episode={
          'show_id':show_id,
          'title':titolo,
@@ -277,20 +352,33 @@ def add_episode(show_id):
 def edit_episode(show_id, episode_id):
    if current_user.type != 'creatore' or not dao.check_show_author(show_id, current_user.id):
       flash('Non disponi dei privilegi necessari per eseguire ques\'azione', 'danger')
-      return redirect(url_for('profile'))
+      return redirect(url_for('show', show_id=show_id))
    
    old_episode=dao.get_episode_by_id(episode_id)
    
    if request.method=='POST':
       titolo=request.form.get('title')
+      if not titolo.strip():
+         flash('Errore, inserisci dei dati validi', 'danger')
+         return redirect(url_for('show', show_id=show_id))
       descrizione=request.form.get('description')
+      if not descrizione.strip():
+         flash('Errore, inserisci dei dati validi', 'danger')
+         return redirect(url_for('show', show_id=show_id))
       data=request.form.get('date')
+      if not data:
+         flash('Errore, inserisci dei dati validi', 'danger')
+         return redirect(url_for('show', show_id=show_id))
+
       audio=request.files['audio']
       filename=old_episode['audio']
       if audio:
          filename=secure_filename(audio.filename)
-         audio.save('static/'+ filename)
-         
+         if not filename.endswith('.mp3'):
+            flash('Errore, carica un file valido', 'danger')
+            return redirect(url_for('show', show_id=show_id))
+         audio.save('static/audio/'+ filename)
+      
       new_episode={
          'show_id':show_id,
          'title':titolo,
@@ -332,7 +420,10 @@ def add_comment(show_id,episode_id):
       flash('Per effettuare questa operazione devi essere registrato','danger')
       return redirect(url_for('show', show_id=show_id))
    if request.method=="POST":
-      commento=request.form.get('comment')   
+      commento=request.form.get('comment') 
+      if not commento.strip():
+         flash('Errore, inserisci un commento valido', 'danger')
+         return redirect(url_for('show', show_id=show_id))  
       new_comment={
          'text': commento,
          'episode_id': episode_id,
@@ -359,7 +450,10 @@ def edit_comment(show_id, comment_id):
       flash('Non disponi dei privilegi necessari per effettuare questa operazione','danger')
       return redirect(url_for('show', show_id=show_id))
    if request.method=="POST":
-      commento=request.form.get('comment')   
+      commento=request.form.get('comment') 
+      if not commento.strip():
+         flash('Errore, inserisci un commento valido', 'danger')
+         return redirect(url_for('show', show_id=show_id))    
       success=dao.edit_comment_by_id(commento, comment_id)
       if success:
          flash('Commento modificato correttamente','success')

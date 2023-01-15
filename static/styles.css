@@ -1,8 +1,25 @@
 * {
-   font-family: Verdana, Geneva, Tahoma, sans-serif;
-   border: 0;
-   padding: 0;
+   font-family: Geneva, Tahoma, sans-serif;
 }
+
+
+footer{
+   background-color: lightgray;
+   position: relative;
+   padding: 30px;
+   height: 30px;
+   bottom: 0px;
+   left: 0px;
+   right: 0px;
+   margin-bottom: 0px;
+}
+
+p{
+   margin: 0px !important;
+}
+
+
+/*home.html*/
 
 .welcome{
    font-size: small !important;
@@ -18,6 +35,10 @@ img {
    border-radius: 5%;
 }
 
+.img-container{
+   min-width: 150px;
+}
+
 .show-container {
    margin: 10px;
    border-bottom: solid gray 1px;
@@ -28,14 +49,12 @@ img {
    margin: 20px;
 }
 
-.show-description{
-margin-top: 10px;
-}
 
 .cat-aside{
    padding: 10px;
    margin: 20px;
    height:100%;
+   min-width: 100px;
 }
 
 .cat-aside > a:hover{
@@ -47,6 +66,74 @@ margin-top: 10px;
    margin-bottom: 10px;
 }
 
-.tag{
-   margin-bottom: 0px;
+
+
+
+/*show.html*/
+
+#search-bar{
+   max-width: 60%;
 }
+
+.show-info{
+   margin-top: 40px;
+   padding: 20px;
+   border-bottom: 1px solid black;
+   min-width: 700px;
+}
+
+#follow-buttons > a{
+   width: 150px;
+   float: right;
+}
+
+
+.episode-list-container{
+ padding: 30px;
+ min-width: 700px;
+ border-bottom: 1px solid black;
+}
+
+.episode-container{
+   padding-left: 30px;
+   padding-right: 30px;
+   margin-bottom: 50px;
+   min-width: 700px;
+}
+
+
+.episode-image{
+   width: 100px;
+   height: 100px;
+}
+
+.comment-list-container{
+padding: 30px;
+}
+
+/*profile.html*/
+
+.account-info{
+   margin-top: 20px;
+   min-width: 200px;
+}
+
+#show-profile-list{
+   margin-top: 20px;
+   margin-bottom: 20px;
+}
+
+.episode-image-profile{
+   width: 60px;
+   height: 60px;
+}
+
+.episode-row{
+   min-width: 500px;
+   margin-top: 10px;
+   margin-bottom: 10px;
+   padding-left: 20px;
+   padding-right: 20px;
+
+}
+

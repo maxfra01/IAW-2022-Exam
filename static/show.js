@@ -1,5 +1,15 @@
 "use strict";
 
+//Modale nuovo episodio
+let currentDate = dayjs();
+const newEpisodeModal=document.getElementById('add-episode-modal')
+newEpisodeModal.addEventListener('show.bs.modal', event => {
+
+  const date= document.getElementById('new-episode-date-input')
+  date.value=currentDate.format('YYYY-MM-DD').toString()
+})
+
+
 //Modale nuovo commento
 const newCommentModal = document.getElementById('new-comment-modal');
 newCommentModal.addEventListener('show.bs.modal', event => {
@@ -78,23 +88,33 @@ confirmDeleteEpisodeModal.addEventListener('show.bs.modal', event => {
   form.action= "/delete-episode/" + showId+ "_" +episodeId ;
 })
 
-//TOGLI CATEGORIA
-const cat=document.getElementById('cat-dropdown')
-cat.style.display= 'none'
 
 //BARRA DI RICERCA
 const searchButton=document.getElementById('search-button')
 const searchBar=document.getElementById('search-bar')
-searchBar.removeAttribute('hidden')
-searchButton.removeAttribute('hidden')
 searchButton.addEventListener('click', event => {
   const key= searchBar.value
   console.log('RICERCA DI '+key)
   
-  const episodes= document.querySelectorAll('.episode-container')
-  for (let i = 0; i < episodes.length; i++) {
-    const element = array[i];
-    
-    
+  const episodeTitles= document.querySelectorAll('#js-episode-title')
+  const episodeDescriptions= document.querySelectorAll('#js-episode-description')
+
+  for (let i = 0; i < episodeTitles.length; i++) {
+    console.log(episodeDescriptions[i].innerHTML)
+    console.log(episodeTitles[i].innerHTML)
+    let match=0;
+    if (episodeTitles[i].innerHTML.toLowerCase().includes(key.toLowerCase())){
+      match=1;
+    }
+    if (episodeDescriptions[i].innerHTML.toLowerCase().includes(key.toLowerCase())){
+      match=1;
+    }
+
+    if (!match){
+      episodeTitles[i].parentElement.classList.add('visually-hidden')
+    }
+    else{
+      episodeTitles[i].parentElement.classList.remove('visually-hidden')
+    }
   }
 })

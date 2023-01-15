@@ -2,34 +2,37 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<!--elenco delle serie di podcast-->
+
 <aside class="col-2 cat-aside ">
   <p class="fw-bold fs-4">Categorie <i class="bi bi-tags"></i></p>
-  <a class="dropdown-item  " href="{{url_for('home_by_category', category='all')}}">Tutte le categorie</a>
+  <p hidden id="js-active-category" >{{active_category}}</p>
+  <a id="js-category-all" class="dropdown-item text-wrap" href="{{url_for('home_by_category', category='all')}}">Tutte le categorie</a>
   {% for cat in categorie %}
-  <a class="dropdown-item" href="{{url_for('home_by_category', category=cat.category)}}">{{cat.category}}</a>
+  <a id="js-category-{{cat.category}}" class="dropdown-item text-wrap" href="{{url_for('home_by_category', category=cat.category)}}">{{cat.category}}</a>
   {% endfor %}
 </aside>
+
+
 <main class=" col-6 show-list">
   {% for serie in serie %}
   <article class="show-container ">
-    <div class="image-and-title row">
+    <div class="row">
       <div class="img-container col-4">
         <img src="{{url_for('static', filename=serie.image)}}" alt="immagine di {{serie.title}}">
       </div>
-      <div class="col-8 right-container">
-        <a class="fs-4 fw-bold" href="{{url_for('show', show_id=serie.id)}}">{{serie.title}}</a>
-        <p>di {{serie.creator_name}}</p>
-        <a class="btn btn-dark" href="{{url_for('show', show_id=serie.id)}}"><i class="bi bi-earbuds"></i>
-          Ascolta ora</a>
+      <div class="col-8 ">
+        <a class="fs-3 fw-bold" href="{{url_for('show', show_id=serie.id)}}">{{serie.title}}</a>
+        <p class="fs-5 fst-italic">di {{serie.creator_name}}</p>
+        <a class="btn btn-primary mt-3 fw-semibold" href="{{url_for('show', show_id=serie.id)}}"><i class="bi bi-headphones"></i>
+          Scopri di più</a>
       </div>
     </div>
     <div class="row show-description">
-    
-      <p>{{serie.description}}</p>
-      <p class="tag">Categoria: {{serie.category}}</p>
+      <p class="mt-3">{{serie.description}}</p>
+      <p class="fst-italic mt-3">Categoria: {{serie.category}}</p>
     </div>
   </article>
   {% endfor %}
 </main>
+<script src="{{url_for('static', filename='home.js')}}"></script>
 {% endblock %}
