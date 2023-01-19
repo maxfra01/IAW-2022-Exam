@@ -21,7 +21,7 @@ login_manager.login_message_category = 'warning'
 login_manager.init_app(app)
 
 def check_name(name):
-   clear_name=name.strip('!\"\'\\£$%&/()=?^ ,.;:-_')
+   clear_name=name.strip('!\"\'\\£$%&/()=?^,.;:-_')
    if clear_name != name:
       return False
    return True
@@ -73,16 +73,16 @@ def signup():
    success=True
    if request.method=="POST":
       name = request.form.get('name')
-      if not check_name(name):
-         flash('Errore, inserisci dei dati validi', 'danger')
+      if not check_name(name) or len(name.strip())==0:
+         flash('Errore, il nome non può contenere carattere speciali o essere vuoto', 'danger')
          return redirect(url_for('home'))
       surname=request.form.get('surname')
-      if not check_name(surname):
-         flash('Errore, inserisci dei dati validi', 'danger')
+      if not check_name(surname) or len(surname.strip())==0:
+         flash('Errore, il cognome non può contenere carattere speciali o essere vuoto', 'danger')
          return redirect(url_for('home'))
       email = request.form.get('email')
       if not check_email(email):
-         flash('Errore, inserisci dei dati validi', 'danger')
+         flash('Errore, email non valida', 'danger')
          return redirect(url_for('home'))
       tipo=request.form.get('type')
       password = request.form.get("password")
@@ -116,7 +116,7 @@ def login():
    if request.method=="POST":
       email=request.form.get("email")
       if not check_email(email):
-         flash('Errore, inserisci dei dati validi', 'danger')
+         flash('Errore, inserisci una mail valida', 'danger')
          return redirect(url_for('home'))
       password=request.form.get("password")
       user_in_db=dao.get_user_by_email(email)
@@ -201,15 +201,15 @@ def newshow():
    if request.method=='POST':
       titolo=request.form.get('title')
       if not titolo.strip():
-         flash('Errore, inserisci dei dati validi', 'danger')
+         flash('Errore, i campi non possono essere vuoti', 'danger')
          return redirect(url_for('profile'))
       categoria=request.form.get('category')
       if not categoria.strip():
-         flash('Errore, inserisci dei dati validi', 'danger')
+         flash('Errore, i campi non possono essere vuoti', 'danger')
          return redirect(url_for('profile'))
       description=request.form.get('description')
       if not description.strip():
-         flash('Errore, inserisci dei dati validi', 'danger')
+         flash('Errore, i campi non possono essere vuoti', 'danger')
          return redirect(url_for('profile'))
       image=request.files['image']
       filename = secure_filename(image.filename)
@@ -250,17 +250,17 @@ def edit_show(show_id):
       
       nuovo_titolo=request.form.get('title')
       if not nuovo_titolo.strip():
-         flash('Errore, inserisci dei dati validi', 'danger')
+         flash('Errore, i campi non possono essere vuoti', 'danger')
          return redirect(url_for('show', show_id=show_id))
       
       nuovo_categoria=request.form.get('category')
       if not nuovo_categoria.strip():
-         flash('Errore, inserisci dei dati validi', 'danger')
+         flash('Errore, i campi non possono essere vuoti', 'danger')
          return redirect(url_for('show', show_id=show_id))
       
       nuova_descrizione=request.form.get('description')
       if not nuova_descrizione.strip():
-         flash('Errore, inserisci dei dati validi', 'danger')
+         flash('Errore, i campi non possono essere vuoti', 'danger')
          return redirect(url_for('show', show_id=show_id))
       
       nuova_immagine=request.files['image']
@@ -313,16 +313,16 @@ def add_episode(show_id):
    if request.method=='POST':
       titolo=request.form.get('title')
       if not titolo.strip():
-         flash('Errore, inserisci dei dati validi', 'danger')
+         flash('Errore, i campi non possono essere vuoti', 'danger')
          return redirect(url_for('show', show_id=show_id))
       descrizione=request.form.get('description')
       if not descrizione.strip():
-         flash('Errore, inserisci dei dati validi', 'danger')
+         flash('Errore, i campi non possono essere vuoti', 'danger')
          return redirect(url_for('show', show_id=show_id))
       data=request.form.get('date')
       
       if not data:
-         flash('Errore, inserisci dei dati validi', 'danger')
+         flash('Errore, i campi non possono essere vuoti', 'danger')
          return redirect(url_for('show', show_id=show_id))
         
       today=datetime.now()
@@ -369,15 +369,15 @@ def edit_episode(show_id, episode_id):
    if request.method=='POST':
       titolo=request.form.get('title')
       if not titolo.strip():
-         flash('Errore, inserisci dei dati validi', 'danger')
+         flash('Errore, i campi non possono essere vuoti', 'danger')
          return redirect(url_for('show', show_id=show_id))
       descrizione=request.form.get('description')
       if not descrizione.strip():
-         flash('Errore, inserisci dei dati validi', 'danger')
+         flash('Errore, i campi non possono essere vuoti', 'danger')
          return redirect(url_for('show', show_id=show_id))
       data=request.form.get('date')
       if not data:
-         flash('Errore, inserisci dei dati validi', 'danger')
+         flash('Errore, i campi non possono essere vuoti', 'danger')
          return redirect(url_for('show', show_id=show_id))
 
       today=datetime.now()

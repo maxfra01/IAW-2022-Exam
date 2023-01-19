@@ -6,3 +6,10 @@
 
 Tutte le password sono '1234'
 
+# Requisiti
+- Flask, flask-login, flask-session
+- werkzeug.security, werkzeug.utils
+- datetime
+- re
+- Bootstrap 5
+- day.js
