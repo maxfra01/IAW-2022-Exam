@@ -33,6 +33,7 @@ img {
    width: 150px;
    height: 150px;
    border-radius: 5%;
+   border: 1px solid black;
 }
 
 .img-container{
@@ -78,7 +79,7 @@ img {
 .show-info{
    margin-top: 40px;
    padding: 20px;
-   border-bottom: 1px solid black;
+   border-bottom: 1px solid gray;
    min-width: 700px;
 }
 
@@ -90,25 +91,22 @@ img {
 
 .episode-list-container{
  padding: 30px;
- min-width: 700px;
- border-bottom: 1px solid black;
+ min-width: 800px;
+ 
 }
+
 
 .episode-container{
    padding-left: 30px;
    padding-right: 30px;
    margin-bottom: 50px;
-   min-width: 700px;
+   min-width: 800px;
 }
 
 
 .episode-image{
    width: 100px;
    height: 100px;
-}
-
-.comment-list-container{
-padding: 30px;
 }
 
 /*profile.html*/

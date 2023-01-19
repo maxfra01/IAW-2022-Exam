@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session, redirect, flash, url_for
+from flask import Flask, render_template, request, session, redirect, flash, url_for, abort
 from flask_login import LoginManager, login_user, logout_user , login_required, current_user
 from flask_session import Session
 from werkzeug.utils import secure_filename
@@ -21,7 +21,7 @@ login_manager.login_message_category = 'warning'
 login_manager.init_app(app)
 
 def check_name(name):
-   clear_name=name.strip('!\"\'\\£$%&/()=?^,.;:-_')
+   clear_name=name.strip('!\"\'\\£$%&/()=?^ ,.;:-_')
    if clear_name != name:
       return False
    return True
@@ -30,6 +30,12 @@ def check_email(email):
    if re.fullmatch(regex, email):
       return True
    return False
+
+
+#404
+@app.errorhandler(404)
+def error_page(e):
+   return render_template('error.html'),404
 
 #HOME E SERIE
 @app.route("/")
@@ -44,12 +50,16 @@ def home_by_category(category):
       return redirect(url_for('home'))
    categorie=dao.get_all_categories()
    serie=dao.get_shows_by_category(category)
+   if not serie:
+      abort(404)
    return render_template('home.html', categorie=categorie, serie=serie, active_category=category)
 
    
 @app.route("/show/<int:show_id>")
 def show(show_id):
    serie=dao.get_show_by_id(show_id)
+   if not serie:
+      abort(404)
    episodi=dao.get_episodes_by_show_id(show_id)
    commenti=dao.get_comments_by_show_id(show_id)
    seguita=0
@@ -326,7 +336,7 @@ def add_episode(show_id):
          if not filename.endswith('.mp3'):
             flash('Errore, carica un file valido', 'danger')
             return redirect(url_for('show', show_id=show_id))
-         audio.save('static/audio/'+ filename)
+         audio.save('static/'+ filename)
       else:
          flash('Errore, carica un file valido', 'danger')
          return redirect(url_for('show', show_id=show_id))
@@ -370,6 +380,11 @@ def edit_episode(show_id, episode_id):
          flash('Errore, inserisci dei dati validi', 'danger')
          return redirect(url_for('show', show_id=show_id))
 
+      today=datetime.now()
+      if datetime.strptime(data,'%Y-%m-%d') > today:
+         flash('Errore, non puoi inserire date oltre quella odierna','danger')
+         return redirect(url_for('show', show_id=show_id))
+
       audio=request.files['audio']
       filename=old_episode['audio']
       if audio:
@@ -377,7 +392,7 @@ def edit_episode(show_id, episode_id):
          if not filename.endswith('.mp3'):
             flash('Errore, carica un file valido', 'danger')
             return redirect(url_for('show', show_id=show_id))
-         audio.save('static/audio/'+ filename)
+         audio.save('static/'+ filename)
       
       new_episode={
          'show_id':show_id,

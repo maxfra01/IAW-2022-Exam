@@ -3,14 +3,14 @@
 
 {% block content %}
 
-<aside class="account-info col-2">
+<aside class="account-info mb-3 col-2">
   <p class="fw-bold fs-4 text-wrap mb-3">I miei dati <i class="bi bi-person-vcard"></i></p>
   <p class="text-wrap mb-2">{{current_user.name}} {{current_user.surname}}</p>
   <p class="text-wrap mb-2">{{current_user.email}}</p>
   <p class="text-wrap">Ruolo: {{current_user.type}}</p>
 </aside>
 
-<main class=" col-6" id="show-profile-list">
+<main class=" col-6 mb-3" id="show-profile-list">
   {% if current_user.type=='creatore' %}
   <article id="creator-section" class="mb-5">
     <p class="fw-bold fs-4">Le mie serie</p>
@@ -20,11 +20,11 @@
         <img class="episode-image-profile" src="{{url_for('static',filename=serie.image)}}" alt="immagine di {{serie.title}}">
       </div>
       <div class="col-7">
-        <a type="text" href="{{url_for('show',show_id=serie.id)}}">{{serie.title}}</a>
+        <a href="{{url_for('show',show_id=serie.id)}}">{{serie.title}}</a>
       </div>
       <div class="col-3">
         <div class="d-flex flex-row justify-content-end ">
-          <a type="text" class="btn btn-outline-warning me-2" href="{{url_for('show',show_id=serie.id)}}"><i
+          <a class="btn btn-outline-warning me-2" href="{{url_for('show',show_id=serie.id)}}"><i
             class="bi bi-pencil-square"></i></a>
             <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#delete-show-modal"
           data-bs-showid="{{serie.id}}"><i class="bi bi-trash"></i></button>
@@ -33,7 +33,7 @@
     </div>
     {% endfor%}
     <div class="episode-row d-flex justify-content-center">
-      <a class="btn btn-success" type="button" data-bs-toggle="modal" data-bs-target="#new-show-modal">Nuova <i class="bi bi-plus-square-dotted"></i></a>
+      <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#new-show-modal">Nuova <i class="bi bi-plus-square-dotted"></i></button>
     </div>
   </article>
   {%endif %}
@@ -46,7 +46,7 @@
         <img class="episode-image-profile" src="{{url_for('static',filename=serie.image)}}" alt="immagine di {{serie.title}}">
       </div>
       <div class="col-7">
-        <a type="text" href="{{url_for('show',show_id=serie.id)}}">{{serie.title}}</a>
+        <a href="{{url_for('show',show_id=serie.id)}}">{{serie.title}}</a>
       </div>
       <div class="d-flex justify-content-end col-3">
          <a class="btn btn-outline-danger" href="{{url_for('unfollow_a_show', show_id=serie.id)}}">Non
@@ -64,39 +64,37 @@
 
 
 <!--MODALE PER NUOVA SERIE-->
-<div class="modal fade" id="new-show-modal"  data-bs-keyboard="false" tabindex="-1"
-  aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<div class="modal fade" id="new-show-modal"  data-bs-keyboard="false" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
+      <form action="new-show" enctype="multipart/form-data" method="post">
       <div class="modal-header">
         <h1 class="modal-title fs-5" id="staticBackdropLabel">Crea una nuova serie</h1>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form action="new-show" enctype="multipart/form-data" method="post">
           <div class="mb-3">
             <label for="title" class="form-label">Titolo</label>
-            <input type="text" required class="form-control" name="title" aria-describedby="Titolo della serie">
+            <input type="text" required class="form-control" id="title" name="title" >
           </div>
           <div class="mb-3">
             <label for="category" class="form-label">Categoria</label>
-            <input type="text" required class="form-control" name="category" aria-describedby="Categoria della serie">
+            <input type="text" required class="form-control" id="category" name="category" >
           </div>
           <div class="mb-3">
             <label for="description" class="form-label">Descrizione</label>
-            <textarea name="description" required class="form-control"
-              aria-describedby="Descrizione della serie"></textarea>
+            <textarea name="description" id="description" required class="form-control"></textarea>
           </div>
           <div class="mb-3">
             <label for="image" class="form-label">Copertina</label>
-            <input type="file" required class="form-control" name="image" aria-describedby="Immagine della serie">
+            <input type="file" required class="form-control" id="image" name="image">
           </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary " data-bs-dismiss="modal">Close</button>
         <button type="submit" class="btn btn-success">Crea la serie</button>
-        </form>
       </div>
+    </form>
     </div>
   </div>
 </div>
@@ -116,7 +114,6 @@
         <form action="/delete-show/" id="delete-show-form" method="post">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
           <button type="submit" class="btn btn-danger">Elimina</button>
-
         </form>
       </div>
     </div>
