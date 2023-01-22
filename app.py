@@ -21,7 +21,7 @@ login_manager.login_message_category = 'warning'
 login_manager.init_app(app)
 
 def check_name(name):
-   pattern = '[^a-zA-Z0-9\s]'
+   pattern = '[^a-zA-Z0-9\'òàèìù\s]'
    match = re.search(pattern, name)
    if match:
       return False
@@ -206,7 +206,7 @@ def newshow():
       if not titolo.strip():
          flash('Errore, i campi non possono essere vuoti', 'danger')
          return redirect(url_for('profile'))
-      categoria=request.form.get('category')
+      categoria=request.form.get('category').lstrip().capitalize()
       if not categoria.strip() or not check_name(categoria):
          flash('Errore, la categoria non può essere vuota o contenere caratteri speciali', 'danger')
          return redirect(url_for('profile'))
@@ -256,7 +256,7 @@ def edit_show(show_id):
          flash('Errore, i campi non possono essere vuoti', 'danger')
          return redirect(url_for('show', show_id=show_id))
       
-      nuovo_categoria=request.form.get('category')
+      nuovo_categoria=request.form.get('category').lstrip().capitalize()
       if not nuovo_categoria.strip() or not check_name(nuovo_categoria):
          flash('Errore, la categoria non può essere vuota o contenere caratteri speciali', 'danger')
          return redirect(url_for('show', show_id=show_id))
