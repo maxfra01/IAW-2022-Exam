@@ -21,10 +21,13 @@ login_manager.login_message_category = 'warning'
 login_manager.init_app(app)
 
 def check_name(name):
-   clear_name=name.strip('!\"\'\\£$%&/()=?^,.;:-_')
-   if clear_name != name:
+   pattern = '[^a-zA-Z0-9\s]'
+   match = re.search(pattern, name)
+   if match:
       return False
-   return True
+   else:
+      return True
+
 def check_email(email):
    regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
    if re.fullmatch(regex, email):
@@ -94,8 +97,8 @@ def signup():
          return redirect(url_for('home'))
       else:
          new_user = {
-            "name": name,
-            "surname": surname,
+            "name": name.lstrip().rstrip(),
+            "surname": surname.lstrip().rstrip(),
             "email": email,
             "type": tipo,
             "password": generate_password_hash(password,method="pbkdf2:sha256")
@@ -131,7 +134,7 @@ def login():
             password=user_in_db['password'],
             tipo=user_in_db['type'])
          login_user(new,False)
-         return redirect(url_for('profile'))
+         return redirect(url_for('home'))
       
 @app.route('/logout')
 @login_required
@@ -204,8 +207,8 @@ def newshow():
          flash('Errore, i campi non possono essere vuoti', 'danger')
          return redirect(url_for('profile'))
       categoria=request.form.get('category')
-      if not categoria.strip():
-         flash('Errore, i campi non possono essere vuoti', 'danger')
+      if not categoria.strip() or not check_name(categoria):
+         flash('Errore, la categoria non può essere vuota o contenere caratteri speciali', 'danger')
          return redirect(url_for('profile'))
       description=request.form.get('description')
       if not description.strip():
@@ -214,14 +217,14 @@ def newshow():
       image=request.files['image']
       filename = secure_filename(image.filename)
       if not filename.endswith('.jpg') :
-         flash('Errore, carica un\'immagine valida', 'danger')
+         flash('Errore, carica un\'immagine .jpg valida', 'danger')
          return redirect(url_for('profile'))
       if image:
          image.save('static/' + filename)
       
-      new_show={ 'title':titolo, 
-                'category': categoria,
-                'description': description,
+      new_show={ 'title':titolo.lstrip().rstrip(), 
+                'category': categoria.lstrip().rstrip(),
+                'description': description.lstrip().rstrip(),
                 'image':filename,
                 'creator_id': current_user.id,
                 'creator_name': current_user.name + " " +current_user.surname
@@ -254,8 +257,8 @@ def edit_show(show_id):
          return redirect(url_for('show', show_id=show_id))
       
       nuovo_categoria=request.form.get('category')
-      if not nuovo_categoria.strip():
-         flash('Errore, i campi non possono essere vuoti', 'danger')
+      if not nuovo_categoria.strip() or not check_name(nuovo_categoria):
+         flash('Errore, la categoria non può essere vuota o contenere caratteri speciali', 'danger')
          return redirect(url_for('show', show_id=show_id))
       
       nuova_descrizione=request.form.get('description')
@@ -269,12 +272,14 @@ def edit_show(show_id):
          filename = secure_filename(nuova_immagine.filename)
          if not filename.endswith('.jpg'):
             flash('Errore, carica un\'immagine valida','danger')
+            return redirect(url_for('show', show_id=show_id))
+
          nuova_immagine.save('static/' + filename)
       
       new_show={'id': old_show['id'], 
-                'title':nuovo_titolo, 
-                'category': nuovo_categoria,
-                'description': nuova_descrizione,
+                'title':nuovo_titolo.lstrip().rstrip(), 
+                'category': nuovo_categoria.lstrip().rstrip(),
+                'description': nuova_descrizione.lstrip().rstrip(),
                 'image':filename,
                 'creator_id': current_user.id,
                 'creator_name': current_user.name + " " +current_user.surname
@@ -342,8 +347,8 @@ def add_episode(show_id):
          return redirect(url_for('show', show_id=show_id))
       new_episode={
          'show_id':show_id,
-         'title':titolo,
-         'description': descrizione,
+         'title':titolo.lstrip().rstrip(),
+         'description': descrizione.lstrip().rstrip(),
          'date': data,
          'audio': filename
       }
@@ -396,8 +401,8 @@ def edit_episode(show_id, episode_id):
       
       new_episode={
          'show_id':show_id,
-         'title':titolo,
-         'description': descrizione,
+         'title':titolo.lstrip().rstrip(),
+         'description': descrizione.lstrip().rstrip(),
          'date': data,
          'audio': filename
       }

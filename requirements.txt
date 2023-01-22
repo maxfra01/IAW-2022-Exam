@@ -1,0 +1,9 @@
+Sono richiesti:
+- Flask, flask-login, flask-session
+- sqlite3
+- werkzeug.security, werkzeug.utils
+- datetime
+- re
+- Bootstrap 5
+- Bootstrap Icons
+- day.js

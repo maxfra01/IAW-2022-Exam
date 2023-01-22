@@ -6,10 +6,6 @@
 
 Tutte le password sono '1234'
 
-# Requisiti
-- Flask, flask-login, flask-session
-- werkzeug.security, werkzeug.utils
-- datetime
-- re
-- Bootstrap 5
-- day.js
+# AlTRE INFORMAZIONI
+- L'applicazione è realizzato per dispostivi laptop-desktop
+- I file accettati dall'applicazione sono '.jpg' per le immagini e '.mp3' per le tracce audio
