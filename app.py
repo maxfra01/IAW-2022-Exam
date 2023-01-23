@@ -498,4 +498,6 @@ def delete_comment(show_id, comment_id):
       flash('Errore nell\'eliminazione del commento, riprovare', 'danger')
       return redirect(url_for('show', show_id=show_id))
       
-app.run(port=5000, debug=True)
+      
+if __name__=='__main__':
+   app.run(port=5000, debug=True)
