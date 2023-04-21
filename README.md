@@ -1,5 +1,5 @@
 # MyPodcast
-WebApp realizzata per gestire podcast.
+WebApp per gestire podcast, realizzato tramite Flask e Bootstrap.  
 
 ### CREDENZIALI LOGIN
 - mariorossi@gmail.com (creatore)
